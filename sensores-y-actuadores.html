@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sensores y Actuadores — Curso Arduino | Universidad Iberoamericana</title>
+  <meta name="description" content="Sensores y actuadores en Arduino: analogía con sentidos y músculos, entradas/salidas, ejemplos comunes y criterios de elección." />
+  <style>
+    :root{
+      --ibero-red:#C8102E;
+      --bg:#0B0F14;
+      --panel:#111827;
+      --panel2:#0F172A;
+      --text:#EAF0FA;
+      --muted:#A8B3C5;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 14px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --max:1120px;
+      --link:rgba(255,255,255,.92);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(200,16,46,.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(90,160,255,.12), transparent 55%),
+        var(--bg);
+      line-height:1.55;
+    }
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
+    a:focus{outline:2px solid rgba(255,255,255,.35);outline-offset:3px;border-radius:12px}
+
+    .topbar{background:var(--ibero-red);height:10px;width:100%}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(11,15,20,.72);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
+    .header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+    .brand{display:flex;align-items:center;gap:12px;min-width:260px;}
+    .brand-mark{
+      width:40px;height:40px;border-radius:12px;
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.55));
+      box-shadow:0 10px 26px rgba(200,16,46,.25);
+      display:grid;place-items:center;font-weight:800;letter-spacing:.5px;
+    }
+    .brand-title{font-weight:800;font-size:14px;letter-spacing:.2px}
+    .brand-sub{font-size:12px;color:var(--muted)}
+    nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .navlink{
+      padding:10px 12px;border:1px solid var(--border);border-radius:999px;
+      background:rgba(17,24,39,.55);font-size:13px;color:var(--text);
+      transition:transform .12s ease, background .12s ease;white-space:nowrap;
+    }
+    .navlink:hover{transform:translateY(-1px);background:rgba(17,24,39,.85);text-decoration:none}
+
+    main{padding:24px 0 36px}
+
+    .hero{
+      background:linear-gradient(180deg, rgba(17,24,39,.86), rgba(15,23,42,.76));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+      padding:22px;
+    }
+    .hero:before{
+      content:"";position:absolute;inset:0;
+      background:
+        radial-gradient(760px 260px at 10% 0%, rgba(200,16,46,.20), transparent 55%),
+        radial-gradient(560px 280px at 90% 20%, rgba(90,160,255,.18), transparent 55%);
+      pointer-events:none;
+    }
+    .hero > *{position:relative}
+    .breadcrumbs{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:10px}
+    .crumb{color:var(--muted)}
+    .crumb strong{color:rgba(255,255,255,.86);font-weight:700}
+    h1{margin:0 0 10px;font-size:clamp(22px,2.6vw,34px);letter-spacing:-.4px;line-height:1.15}
+    .lead{margin:0;color:var(--muted);font-size:14px;max-width:94ch}
+
+    .layout{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-top:14px;align-items:start}
+    .panel{
+      background:rgba(17,24,39,.70);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .content{padding:18px}
+    .content h2{margin:18px 0 8px;font-size:18px;letter-spacing:-.2px}
+    .content h2:first-child{margin-top:0}
+    .content h3{margin:14px 0 6px;font-size:16px;letter-spacing:-.2px}
+    .content p{margin:0 0 12px;color:rgba(255,255,255,.90)}
+    .content ul{margin:0 0 12px;padding-left:18px;color:rgba(255,255,255,.90)}
+    .content li{margin:6px 0}
+    .content p.muted{color:var(--muted)}
+
+    .callout{
+      border:1px solid rgba(200,16,46,.28);
+      background:linear-gradient(180deg, rgba(200,16,46,.14), rgba(200,16,46,.06));
+      border-radius:16px;
+      padding:14px;
+      margin:14px 0;
+      color:rgba(255,255,255,.92);
+    }
+
+    .img-slot{
+      border:1px dashed rgba(255,255,255,.22);
+      border-radius:16px;
+      background:rgba(15,23,42,.35);
+      padding:14px;
+      margin:12px 0 16px;
+    }
+    .img-slot .label{
+      display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      font-size:12px;color:var(--muted);margin-bottom:10px;
+    }
+    .img-slot .box{
+      width:100%;
+      aspect-ratio: 16/9;
+      border-radius:12px;
+      background:rgba(255,255,255,.05);
+      display:grid;
+      place-items:center;
+      color:rgba(255,255,255,.70);
+      font-size:13px;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:rgba(15,23,42,.55);
+      margin:12px 0 16px;
+    }
+    table{width:100%;border-collapse:collapse;min-width:820px}
+    th,td{
+      padding:12px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      vertical-align:top;
+      font-size:13px;
+      color:rgba(255,255,255,.90);
+    }
+    th{
+      text-align:left;
+      color:rgba(255,255,255,.82);
+      background:rgba(255,255,255,.04);
+      position:sticky;top:0;
+    }
+    td small{color:var(--muted);display:block;margin-top:4px}
+
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:12px;
+      margin:12px 0 16px;
+    }
+    .card{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(15,23,42,.55);
+      border-radius:16px;
+      padding:14px;
+    }
+    .card h4{margin:0 0 8px;font-size:14px;letter-spacing:-.1px}
+    .card p{margin:0;color:var(--muted);font-size:13px}
+
+    .aside{padding:14px;display:flex;flex-direction:column;gap:12px}
+    .mini{
+      padding:14px;border-radius:16px;border:1px solid var(--border);
+      background:rgba(11,15,20,.35);
+    }
+    .mini h4{
+      margin:0 0 6px;font-size:13px;letter-spacing:.2px;text-transform:uppercase;
+      color:rgba(255,255,255,.82);
+    }
+    .mini p{margin:0;font-size:13px;color:var(--muted)}
+    .toc a{display:block;padding:9px 10px;border-radius:12px}
+    .toc a:hover{background:rgba(255,255,255,.05);text-decoration:none}
+
+    .nextprev{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:11px 14px;border-radius:14px;border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      font-weight:800;font-size:13px;
+      transition:transform .12s ease, background .12s ease;
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.10);text-decoration:none}
+    .btn-primary{
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.75));
+      border-color:rgba(200,16,46,.35);
+      box-shadow:0 12px 28px rgba(200,16,46,.22);
+    }
+
+    footer{
+      border-top:1px solid var(--border);
+      background:rgba(11,15,20,.72);
+      padding:16px 0;
+    }
+    .footer-row{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      color:var(--muted);font-size:12px;
+    }
+
+    @media (max-width:980px){
+      .layout{grid-template-columns:1fr}
+      .cards{grid-template-columns:1fr}
+    }
+    @media (max-width:620px){
+      .header-row{align-items:flex-start;flex-direction:column}
+      nav{justify-content:flex-start}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar" aria-hidden="true"></div>
+
+  <header>
+    <div class="container">
+      <div class="header-row">
+        <div class="brand" aria-label="Encabezado del curso">
+          <div class="brand-mark" aria-hidden="true">A</div>
+          <div>
+            <div class="brand-title">Arduino — Curso Base</div>
+            <div class="brand-sub">Universidad Iberoamericana</div>
+          </div>
+        </div>
+
+        <nav aria-label="Navegación principal">
+          <a class="navlink" href="index.html">Home</a>
+          <a class="navlink" href="digital-vs-analogico.html">Digital vs Análogo</a>
+          <a class="navlink" href="sensores-y-actuadores.html" aria-current="page">Sensores y Actuadores</a>
+          <a class="navlink" href="digitalwrite.html">digitalWrite</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" aria-label="Sensores y Actuadores">
+      <div class="breadcrumbs">
+        <span class="crumb"><a href="index.html">Home</a></span>
+        <span class="crumb">/</span>
+        <span class="crumb"><strong>Sensores y Actuadores</strong></span>
+      </div>
+
+      <h1>Sensores y Actuadores: “sentidos” y “músculos” del sistema</h1>
+      <p class="lead">
+        Si lo pensamos como un organismo: los <strong>sensores</strong> son los <strong>sentidos</strong> (captan el mundo),
+        el microcontrolador es el “cerebro práctico” (decide) y los <strong>actuadores</strong> son los <strong>músculos</strong>
+        (hacen que algo pase). Un proyecto interactivo no es más que ese ciclo repetido: percibir → decidir → actuar.
+      </p>
+    </section>
+
+    <section class="layout" aria-label="Contenido principal y navegación">
+      <!-- CONTENIDO -->
+      <article class="panel content">
+
+        <h2 id="idea">1) La idea central (en lenguaje humano)</h2>
+        <p>
+          Un <strong>sensor</strong> mide una variable del entorno y la convierte en una señal eléctrica.
+          Un <strong>actuador</strong> toma una señal eléctrica y la convierte en una acción física o perceptible:
+          luz, movimiento, sonido, calor, vibración, etc.
+        </p>
+        <p>
+          En Arduino, a nivel conceptual, los sensores son <strong>entradas</strong> y los actuadores son <strong>salidas</strong>.
+          La gracia está en que el “cerebro” (tu código) conecta ambos mundos con decisiones: <em>si sucede X, entonces hago Y</em>.
+        </p>
+
+        <div class="callout">
+          <strong>Analogía útil:</strong> Sensor = “ojo/oído/piel” (capta). Actuador = “músculo/voz” (expresa).
+          Arduino = “reflejo” (rápido, directo, repetible).
+        </div>
+
+        <h2 id="sentidos">2) Sensores como sentidos humanos (ejemplos claros)</h2>
+        <p>
+          Los sentidos humanos no “entienden” voltajes; entienden estímulos. En electrónica hacemos lo mismo,
+          solo que traducimos el estímulo a señal eléctrica.
+        </p>
+
+        <div class="cards" aria-label="Ejemplos sensoriales">
+          <div class="card">
+            <h4>Vista (luz)</h4>
+            <p>
+              LDR / fotocelda, fotodiodo, sensores de color o cámaras.
+              Miden <strong>intensidad</strong> o <strong>características</strong> de la luz.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Oído (vibración / sonido)</h4>
+            <p>
+              Micrófono o sensor de vibración. Detecta presencia de sonido, nivel de ruido, o impactos.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Tacto (presión / fuerza)</h4>
+            <p>
+              Botón, interruptor, FSR (Force Sensitive Resistor), sensores capacitivos.
+              Detectan contacto o presión.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Olfato/Gusto (química)</h4>
+            <p>
+              Sensores de gas (VOC, humo), pH, conductividad, CO₂ (según el módulo).
+              Miden “composición” del entorno.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Equilibrio (orientación)</h4>
+            <p>
+              Acelerómetro/giroscopio (IMU). Mide inclinación, movimiento y rotación.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Temperatura / “sensación térmica”</h4>
+            <p>
+              Termistores, sensores digitales (p. ej. DHT, DS18B20).
+              Miden temperatura (y a veces humedad).
+            </p>
+          </div>
+        </div>
+
+        <p>
+          Nota didáctica: muchos sensores no son “humanos”, son “sobrehumanos”:
+          pueden medir distancias por ultrasonido, campos magnéticos, radiación, etc.
+          Son sentidos que no tenemos… y por eso el prototipado se vuelve tan interesante.
+        </p>
+
+        <h2 id="musculos">3) Actuadores como músculos (y otras formas de “expresión”)</h2>
+        <p>
+          Si los sensores te dicen qué pasa, los actuadores te permiten responder.
+          Algunos actúan como músculos (movimiento), otros como piel (luz), voz (sonido),
+          o incluso como “sistema nervioso” (vibración/feedback háptico).
+        </p>
+
+        <div class="cards" aria-label="Ejemplos de actuadores">
+          <div class="card">
+            <h4>Músculos (movimiento)</h4>
+            <p>
+              Servo, motor DC, motor a pasos. Convierten energía eléctrica en movimiento.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Piel (luz)</h4>
+            <p>
+              LEDs, tiras LED, NeoPixels. Muestran estados, alertas o ambientes.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Voz (sonido)</h4>
+            <p>
+              Buzzer, bocina + amplificador. Útil para avisos, feedback y señales.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Fuerza “indirecta”</h4>
+            <p>
+              Relevadores, MOSFETs. No son actuadores “visibles”, pero controlan cargas mayores:
+              bombas, lámparas, válvulas, etc.
+            </p>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Regla de supervivencia:</strong> Arduino NO es un músculo fuerte. Es un “nervio”.
+          Para motores, tiras LED grandes o bombas, necesitas “músculo externo” (driver, MOSFET, relevador).
+        </div>
+
+        <h2 id="tabla">4) Tabla rápida: qué entra y qué sale</h2>
+        <p>
+          Esto ayuda a clasificar el “tipo de señal” y elegir cómo conectarlo/leerlo.
+        </p>
+
+        <div class="table-wrap" aria-label="Tabla de sensores y actuadores por tipo de señal">
+          <table>
+            <thead>
+              <tr>
+                <th>Categoría</th>
+                <th>Ejemplos</th>
+                <th>Tipo de señal (idea)</th>
+                <th>En Arduino se maneja como…</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sensores digitales</strong></td>
+                <td>Botón, switch, PIR (algunos), fin de carrera</td>
+                <td>Estados discretos (0/1)</td>
+                <td><small>Entrada digital (digitalRead)</small></td>
+              </tr>
+              <tr>
+                <td><strong>Sensores análogos</strong></td>
+                <td>Potenciómetro, LDR (con divisor), FSR</td>
+                <td>Continuo (voltaje variable)</td>
+                <td><small>Entrada análoga (analogRead)</small></td>
+              </tr>
+              <tr>
+                <td><strong>Sensores “inteligentes”</strong></td>
+                <td>IMU, DHT, sensores I2C/SPI</td>
+                <td>Comunicación por protocolo</td>
+                <td><small>Bus I2C/SPI/Serial + librería</small></td>
+              </tr>
+              <tr>
+                <td><strong>Actuadores simples</strong></td>
+                <td>LED, buzzer básico</td>
+                <td>Encendido/apagado</td>
+                <td><small>Salida digital (digitalWrite)</small></td>
+              </tr>
+              <tr>
+                <td><strong>Actuadores con “intensidad”</strong></td>
+                <td>LED dimmer, motor con control de velocidad</td>
+                <td>Control por PWM (digital rápido)</td>
+                <td><small>Salida PWM (analogWrite o equivalente)</small></td>
+              </tr>
+              <tr>
+                <td><strong>Actuadores de potencia</strong></td>
+                <td>Bombas, válvulas, motores grandes</td>
+                <td>Requieren driver / conmutación</td>
+                <td><small>MOSFET / relevador / driver</small></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="flujo">5) El ciclo completo: percibir → decidir → actuar</h2>
+        <p>
+          La estructura de casi todos los proyectos (sin importar lo “artístico” o “industrial” que sea) se repite:
+        </p>
+        <ul>
+          <li><strong>Percibir:</strong> leo el sensor (¿qué está pasando?)</li>
+          <li><strong>Decidir:</strong> aplico una regla (¿qué significa?)</li>
+          <li><strong>Actuar:</strong> muevo/ilumino/sonorizo (¿qué hago al respecto?)</li>
+        </ul>
+
+        <div class="img-slot" aria-label="Espacio para diagrama del ciclo">
+          <div class="label">
+            <span><strong>Espacio para imagen:</strong> diagrama del ciclo Sensor → Código → Actuador</span>
+            <span>Reemplazar por <code>&lt;img&gt;</code> cuando la tengas</span>
+          </div>
+          <div class="box">[ Coloca aquí un diagrama simple de flujo ]</div>
+        </div>
+
+        <h2 id="ejemplos">6) Ejemplos de proyectos (para aterrizarlo)</h2>
+        <ul>
+          <li><strong>Luz automática:</strong> sensor de luz (LDR) → si oscurece → enciende LED o lámpara (relevador).</li>
+          <li><strong>Alarma de apertura:</strong> switch magnético → si se abre → buzzer + luz.</li>
+          <li><strong>Ventilación inteligente:</strong> sensor de temperatura → si supera umbral → activa ventilador (MOSFET/driver).</li>
+          <li><strong>Interacción con movimiento:</strong> PIR → si detecta presencia → activa una animación con LEDs.</li>
+          <li><strong>Control por perilla:</strong> potenciómetro → controla brillo (PWM) o posición de un servo.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Moraleja:</strong> Un “buen” prototipo no es el que tiene más sensores, sino el que tiene una relación clara:
+          <em>qué mide</em>, <em>qué decide</em>, y <em>qué cambia</em>.
+        </div>
+
+        <h2 id="cierre">7) Cierre</h2>
+        <p>
+          Si te quedas con una sola idea: sensores = entrada (sentidos), actuadores = salida (músculos).
+          Arduino conecta ambos con reglas simples y repetibles. En la siguiente página ya pasamos a “mover el músculo”:
+          <strong>digitalWrite</strong>.
+        </p>
+
+        <div class="nextprev" aria-label="Navegación siguiente anterior">
+          <a class="btn" href="digital-vs-analogico.html">← Volver: Digital vs Análogo</a>
+          <a class="btn btn-primary" href="digitalwrite.html">Siguiente: Programación (digitalWrite) →</a>
+        </div>
+      </article>
+
+      <!-- ASIDE -->
+      <aside class="panel aside" aria-label="Navegación lateral">
+        <div class="mini toc">
+          <h4>En esta página</h4>
+          <a href="#idea">1) Idea central</a>
+          <a href="#sentidos">2) Sensores = sentidos</a>
+          <a href="#musculos">3) Actuadores = músculos</a>
+          <a href="#tabla">4) Tabla rápida</a>
+          <a href="#flujo">5) Ciclo completo</a>
+          <a href="#ejemplos">6) Ejemplos</a>
+          <a href="#cierre">7) Cierre</a>
+        </div>
+
+        <div class="mini">
+          <h4>Tip práctico</h4>
+          <p>
+            Si un actuador “jala mucho”, no lo conectes directo al pin.
+            Arduino decide, el driver ejecuta.
+          </p>
+        </div>
+
+        <div class="mini">
+          <h4>Para explicar en clase</h4>
+          <p>
+            “Los sensores te dan <em>información</em>. Los actuadores generan <em>consecuencias</em>.”
+            Así se entiende el diseño de interacción sin perderse en cables.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-row">
+        <div>© Dr. Iroel Heredia 2026</div>
+        <div>Universidad Iberoamericana · Curso Arduino (sitio local)</div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

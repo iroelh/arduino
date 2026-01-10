@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Instalación — Curso Arduino | Universidad Iberoamericana</title>
+  <meta name="description" content="Instalación de Arduino IDE, drivers CH340/CH341 y configuración para programar ESP32 desde Arduino IDE." />
+  <style>
+    :root{
+      --ibero-red:#C8102E;
+      --bg:#0B0F14;
+      --panel:#111827;
+      --panel2:#0F172A;
+      --text:#EAF0FA;
+      --muted:#A8B3C5;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 14px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --max:1120px;
+      --link:rgba(255,255,255,.92);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(200,16,46,.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(90,160,255,.12), transparent 55%),
+        var(--bg);
+      line-height:1.55;
+    }
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
+    a:focus{outline:2px solid rgba(255,255,255,.35);outline-offset:3px;border-radius:12px}
+
+    .topbar{background:var(--ibero-red);height:10px;width:100%}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(11,15,20,.72);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
+    .header-row{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;
+    }
+    .brand{display:flex;align-items:center;gap:12px;min-width:260px;}
+    .brand-mark{
+      width:40px;height:40px;border-radius:12px;
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.55));
+      box-shadow:0 10px 26px rgba(200,16,46,.25);
+      display:grid;place-items:center;font-weight:800;letter-spacing:.5px;
+    }
+    .brand-title{font-weight:800;font-size:14px;letter-spacing:.2px}
+    .brand-sub{font-size:12px;color:var(--muted)}
+    nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .navlink{
+      padding:10px 12px;border:1px solid var(--border);border-radius:999px;
+      background:rgba(17,24,39,.55);font-size:13px;color:var(--text);
+      transition:transform .12s ease, background .12s ease;white-space:nowrap;
+    }
+    .navlink:hover{transform:translateY(-1px);background:rgba(17,24,39,.85);text-decoration:none}
+
+    main{padding:24px 0 36px}
+
+    .hero{
+      background:linear-gradient(180deg, rgba(17,24,39,.86), rgba(15,23,42,.76));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+      padding:22px;
+    }
+    .hero:before{
+      content:"";position:absolute;inset:0;
+      background:
+        radial-gradient(760px 260px at 10% 0%, rgba(200,16,46,.20), transparent 55%),
+        radial-gradient(560px 280px at 90% 20%, rgba(90,160,255,.18), transparent 55%);
+      pointer-events:none;
+    }
+    .hero > *{position:relative}
+    .breadcrumbs{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:10px}
+    .crumb{color:var(--muted)}
+    .crumb strong{color:rgba(255,255,255,.86);font-weight:700}
+    h1{margin:0 0 10px;font-size:clamp(22px,2.6vw,34px);letter-spacing:-.4px;line-height:1.15}
+    .lead{margin:0;color:var(--muted);font-size:14px;max-width:90ch}
+
+    .layout{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-top:14px;align-items:start}
+    .panel{
+      background:rgba(17,24,39,.70);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .content{padding:18px}
+    .content h2{margin:18px 0 8px;font-size:18px;letter-spacing:-.2px}
+    .content h2:first-child{margin-top:0}
+    .content h3{margin:14px 0 6px;font-size:16px;letter-spacing:-.2px}
+    .content p{margin:0 0 12px;color:rgba(255,255,255,.90)}
+    .content p.muted{color:var(--muted)}
+    .content ul{margin:0 0 12px;padding-left:18px;color:rgba(255,255,255,.90)}
+    .content li{margin:6px 0}
+    code,kbd{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:12px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      padding:2px 6px;
+      border-radius:8px;
+      color:rgba(255,255,255,.92);
+    }
+
+    .callout{
+      border:1px solid rgba(200,16,46,.28);
+      background:linear-gradient(180deg, rgba(200,16,46,.14), rgba(200,16,46,.06));
+      border-radius:16px;
+      padding:14px;
+      margin:14px 0;
+      color:rgba(255,255,255,.92);
+    }
+
+    details{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      background:rgba(15,23,42,.55);
+      padding:10px 12px;
+      margin:10px 0 14px;
+    }
+    summary{
+      cursor:pointer;
+      font-weight:800;
+      color:rgba(255,255,255,.88);
+      list-style:none;
+    }
+    summary::-webkit-details-marker{display:none}
+    summary:after{
+      content:"▾";
+      float:right;
+      opacity:.7;
+    }
+    details[open] summary:after{content:"▴"}
+
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:rgba(15,23,42,.55);
+      margin:12px 0 16px;
+    }
+    table{width:100%;border-collapse:collapse;min-width:760px}
+    th,td{
+      padding:12px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      vertical-align:top;
+      font-size:13px;
+      color:rgba(255,255,255,.90);
+    }
+    th{
+      text-align:left;
+      color:rgba(255,255,255,.82);
+      background:rgba(255,255,255,.04);
+      position:sticky;top:0;
+    }
+
+    .aside{padding:14px;display:flex;flex-direction:column;gap:12px}
+    .mini{
+      padding:14px;border-radius:16px;border:1px solid var(--border);
+      background:rgba(11,15,20,.35);
+    }
+    .mini h4{
+      margin:0 0 6px;font-size:13px;letter-spacing:.2px;text-transform:uppercase;
+      color:rgba(255,255,255,.82);
+    }
+    .mini p{margin:0;font-size:13px;color:var(--muted)}
+    .toc a{display:block;padding:9px 10px;border-radius:12px}
+    .toc a:hover{background:rgba(255,255,255,.05);text-decoration:none}
+
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:11px 14px;border-radius:14px;border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      font-weight:800;font-size:13px;
+      transition:transform .12s ease, background .12s ease;
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.10);text-decoration:none}
+    .btn-primary{
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.75));
+      border-color:rgba(200,16,46,.35);
+      box-shadow:0 12px 28px rgba(200,16,46,.22);
+    }
+
+    footer{
+      border-top:1px solid var(--border);
+      background:rgba(11,15,20,.72);
+      padding:16px 0;
+    }
+    .footer-row{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      color:var(--muted);font-size:12px;
+    }
+
+    @media (max-width:980px){ .layout{grid-template-columns:1fr} }
+    @media (max-width:620px){
+      .header-row{align-items:flex-start;flex-direction:column}
+      nav{justify-content:flex-start}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar" aria-hidden="true"></div>
+
+  <header>
+    <div class="container">
+      <div class="header-row">
+        <div class="brand" aria-label="Encabezado del curso">
+          <div class="brand-mark" aria-hidden="true">A</div>
+          <div>
+            <div class="brand-title">Arduino — Curso Base</div>
+            <div class="brand-sub">Universidad Iberoamericana</div>
+          </div>
+        </div>
+
+        <nav aria-label="Navegación principal">
+          <a class="navlink" href="index.html">Home</a>
+          <a class="navlink" href="introduccion.html">Introducción</a>
+          <a class="navlink" href="instalacion.html" aria-current="page">Instalación</a>
+          <a class="navlink" href="digital-vs-analogico.html">Digital vs Análogo</a>
+          <a class="navlink" href="https://www.arduino.cc/" target="_blank" rel="noopener noreferrer">Arduino (oficial)</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" aria-label="Instalación del entorno">
+      <div class="breadcrumbs">
+        <span class="crumb"><a href="index.html">Home</a></span>
+        <span class="crumb">/</span>
+        <span class="crumb"><strong>Instalación</strong></span>
+      </div>
+
+      <h1>Instalación: Arduino IDE, drivers y ESP32 en el IDE</h1>
+      <p class="lead">
+        Este paso define la experiencia del curso: si el IDE está bien instalado y tu computadora “ve” la placa,
+        lo demás fluye. Si no, el LED parpadea… pero tus emociones también.
+      </p>
+
+      <div class="btnrow" aria-label="Accesos rápidos">
+        <a class="btn btn-primary" href="https://www.arduino.cc/en/software" target="_blank" rel="noopener noreferrer">
+          Descargar Arduino IDE (oficial)
+        </a>
+        <a class="btn" href="https://support.arduino.cc/hc/en-us/articles/360019833020-Download-and-install-Arduino-IDE"
+           target="_blank" rel="noopener noreferrer">
+          Guía oficial de instalación (Arduino Support)
+        </a>
+      </div>
+    </section>
+
+    <section class="layout" aria-label="Contenido principal y navegación">
+      <!-- CONTENIDO -->
+      <article class="panel content">
+        <h2 id="oficial">1) Sitios oficiales que sí conviene usar</h2>
+        <p>
+          Para evitar instaladores “creativos” de terceros, aquí están los dos vínculos que te interesan para clase:
+          el <strong>sitio oficial</strong> (información general y ecosistema) y el <strong>sitio de descarga</strong>
+          del Arduino IDE.
+        </p>
+        <ul>
+          <li><strong>Sitio oficial Arduino:</strong> <a href="https://www.arduino.cc/" target="_blank" rel="noopener noreferrer">arduino.cc</a></li>
+          <li><strong>Descarga de Arduino IDE:</strong> <a href="https://www.arduino.cc/en/software" target="_blank" rel="noopener noreferrer">arduino.cc/en/software</a></li>
+          <li><strong>Documentación IDE 2:</strong> <a href="https://docs.arduino.cc/software/ide-v2/tutorials/getting-started/ide-v2-downloading-and-installing"
+            target="_blank" rel="noopener noreferrer">Arduino Docs (IDE 2)</a></li>
+        </ul>
+
+        <div class="callout">
+          <strong>Recomendación práctica:</strong> Para la mayoría de cursos, usa <strong>Arduino IDE 2</strong>.
+          Mantén la instalación limpia, y evita tener 3 IDEs distintos “porque sí”. La computadora también necesita paz.
+        </div>
+
+        <h2 id="tipica">2) Instalación típica (paso a paso, sin drama)</h2>
+        <p>
+          La instalación “típica” es la que te deja listo para: abrir el IDE, seleccionar placa/puerto, subir un ejemplo,
+          y ver comunicación en el monitor serial.
+        </p>
+
+        <details open>
+          <summary>Windows (recomendado para laboratorios)</summary>
+          <ul>
+            <li>Descarga el instalador desde <a href="https://www.arduino.cc/en/software" target="_blank" rel="noopener noreferrer">Arduino Software</a>.</li>
+            <li>Ejecuta el instalador (idealmente con permisos de administrador si el equipo está restringido).</li>
+            <li>Acepta la instalación de drivers si Windows lo solicita (cuando aplica).</li>
+            <li>Abre Arduino IDE → conecta tu placa por USB.</li>
+            <li>Ve a <kbd>Tools</kbd> → <kbd>Board</kbd> y selecciona tu placa.</li>
+            <li>Ve a <kbd>Tools</kbd> → <kbd>Port</kbd> y selecciona el puerto COM que aparezca.</li>
+            <li>Prueba: <kbd>File</kbd> → <kbd>Examples</kbd> → <kbd>01.Basics</kbd> → <kbd>Blink</kbd> y súbelo.</li>
+          </ul>
+          <p class="muted">
+            Si el puerto no aparece, casi siempre es: cable solo-carga, driver faltante, o puerto USB problemático.
+          </p>
+        </details>
+
+        <details>
+          <summary>macOS</summary>
+          <ul>
+            <li>Descarga Arduino IDE desde <a href="https://www.arduino.cc/en/software" target="_blank" rel="noopener noreferrer">Arduino Software</a>.</li>
+            <li>Instala/arrastra la app a Applications (según el paquete).</li>
+            <li>Conecta la placa y revisa permisos si el sistema pregunta.</li>
+            <li>Selecciona placa y puerto en <kbd>Tools</kbd>.</li>
+          </ul>
+          <p class="muted">En macOS los clones pueden requerir drivers específicos (ver sección CH340).</p>
+        </details>
+
+        <details>
+          <summary>Linux</summary>
+          <ul>
+            <li>Instala Arduino IDE desde el sitio oficial (evita repos muy viejos, si es posible).</li>
+            <li>Conecta la placa y verifica permisos del puerto serie (grupo <code>dialout</code> suele ser clave).</li>
+            <li>Selecciona placa/puerto y prueba <kbd>Blink</kbd>.</li>
+          </ul>
+        </details>
+
+        <h2 id="ch340">3) Driver CH340/CH341 (cuando tu “Arduino” es un clon)</h2>
+        <p>
+          Muchos Arduinos compatibles (y también algunas placas ESP32 económicas) usan un convertidor USB–Serial
+          de la familia <strong>CH340/CH341</strong>. Cuando tu computadora no reconoce la placa (no aparece puerto),
+          instalar este driver suele resolverlo.
+        </p>
+
+        <div class="callout">
+          <strong>Pista rápida:</strong> Si conectas la placa y <em>no aparece ningún puerto nuevo</em>, sospecha del cable o del driver.
+          Si además la placa “se ve genérica” o es compatible, el CH340 entra a escena como protagonista.
+        </div>
+
+        <p>
+          Descarga oficial del driver (fabricante WCH):
+          <a href="https://www.wch-ic.com/downloads/ch341ser_exe.html" target="_blank" rel="noopener noreferrer">
+            CH341SER (CH340/CH341) — WCH
+          </a>
+        </p>
+
+        <details open>
+          <summary>Instalación CH340 en Windows (guía breve)</summary>
+          <ul>
+            <li>Descarga el instalador oficial <a href="https://www.wch-ic.com/downloads/ch341ser_exe.html" target="_blank" rel="noopener noreferrer">CH341SER.EXE</a>.</li>
+            <li>Ejecuta el instalador (si tu equipo es institucional, pide permisos de admin si hace falta).</li>
+            <li>Reinicia el IDE (y si algo se pone necio, reinicia Windows: sí, a veces funciona por arte oscuro corporativo).</li>
+            <li>Conecta la placa y vuelve a revisar <kbd>Tools</kbd> → <kbd>Port</kbd>.</li>
+          </ul>
+        </details>
+
+        <details>
+          <summary>¿Cómo sé si lo necesito?</summary>
+          <ul>
+            <li>Si el puerto no aparece en Arduino IDE.</li>
+            <li>Si en Windows, en “Administrador de dispositivos”, ves un dispositivo USB/Serial sin driver.</li>
+            <li>Si tu placa (Arduino compatible/ESP32 barata) anuncia “CH340/CH341” en la serigrafía o en la ficha del vendedor.</li>
+          </ul>
+        </details>
+
+        <h2 id="esp32">4) Programar ESP32 desde Arduino IDE (configuración oficial)</h2>
+        <p>
+          Para “controlar” (programar) una placa <strong>ESP32</strong> desde Arduino IDE, no cambias el IDE:
+          lo que haces es instalar un <strong>paquete de tarjetas</strong> (board support package) de Espressif,
+          usando el <strong>Boards Manager</strong>.
+        </p>
+
+        <div class="table-wrap" aria-label="URLs oficiales para ESP32 en Arduino IDE">
+          <table>
+            <thead>
+              <tr>
+                <th>Paquete</th>
+                <th>¿Cuándo usarlo?</th>
+                <th>URL (para “Additional Board Manager URLs”)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Stable</strong></td>
+                <td>Clase normal y laboratorios: menos sorpresas.</td>
+                <td><code>https://espressif.github.io/arduino-esp32/package_esp32_index.json</code></td>
+              </tr>
+              <tr>
+                <td><strong>Development</strong></td>
+                <td>Solo si necesitas algo muy nuevo y aceptas riesgo.</td>
+                <td><code>https://espressif.github.io/arduino-esp32/package_esp32_dev_index.json</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <details open>
+          <summary>Instalación ESP32 (Boards Manager, paso a paso)</summary>
+          <ul>
+            <li>Abre Arduino IDE.</li>
+            <li>Ve a <kbd>File</kbd> → <kbd>Preferences</kbd>.</li>
+            <li>En <strong>Additional Board Manager URLs</strong>, pega la URL de <strong>Stable</strong>:
+              <code>https://espressif.github.io/arduino-esp32/package_esp32_index.json</code>
+            </li>
+            <li>Da OK / Apply.</li>
+            <li>Ve a <kbd>Tools</kbd> → <kbd>Board</kbd> → <kbd>Boards Manager</kbd>.</li>
+            <li>Busca <strong>esp32</strong> e instala <strong>“ESP32 by Espressif Systems”</strong>.</li>
+            <li>Reinicia Arduino IDE (recomendado).</li>
+            <li>Selecciona tu placa: <kbd>Tools</kbd> → <kbd>Board</kbd> (por ejemplo “ESP32 Dev Module” si es genérica).</li>
+            <li>Selecciona el puerto: <kbd>Tools</kbd> → <kbd>Port</kbd>.</li>
+            <li>Prueba con <kbd>Blink</kbd> o un ejemplo de ESP32.</li>
+          </ul>
+          <p class="muted">
+            Nota: algunas placas ESP32 requieren mantener presionado el botón <strong>BOOT</strong> durante el upload
+            (depende del modelo/bootloader).
+          </p>
+        </details>
+
+        <details>
+          <summary>Troubleshooting rápido (lo típico en clase)</summary>
+          <ul>
+            <li><strong>No aparece el puerto:</strong> prueba otro cable USB (muchos son solo carga), otro USB, o instala CH340 si aplica.</li>
+            <li><strong>Upload falla:</strong> revisa que elegiste la placa correcta y el puerto correcto; intenta presionar <strong>BOOT</strong> al subir.</li>
+            <li><strong>Se conecta y desconecta:</strong> cable malo o puerto USB con poca potencia.</li>
+            <li><strong>Permisos (Linux):</strong> falta acceso al puerto serie (grupo <code>dialout</code> u equivalente).</li>
+          </ul>
+        </details>
+
+        <h2 id="cierre">5) Cierre: la prueba “mínima viable”</h2>
+        <p>
+          Si logras subir <strong>Blink</strong> a Arduino y ves un puerto estable; y además logras instalar el paquete de ESP32
+          (aunque no lo uses todavía), estás listo para el resto del curso.
+        </p>
+
+        <div class="btnrow" aria-label="Navegación siguiente anterior">
+          <a class="btn" href="introduccion.html">← Volver: Introducción</a>
+          <a class="btn btn-primary" href="digital-vs-analogico.html">Siguiente: Digital vs Análogo →</a>
+        </div>
+      </article>
+
+      <!-- ASIDE -->
+      <aside class="panel aside" aria-label="Navegación y recursos">
+        <div class="mini toc">
+          <h4>En esta página</h4>
+          <a href="#oficial">1) Sitios oficiales</a>
+          <a href="#tipica">2) Instalación típica</a>
+          <a href="#ch340">3) Driver CH340/CH341</a>
+          <a href="#esp32">4) ESP32 en Arduino IDE</a>
+          <a href="#cierre">5) Cierre</a>
+        </div>
+
+        <div class="mini">
+          <h4>Descargas (externo)</h4>
+          <p>
+            - <a href="https://www.arduino.cc/en/software" target="_blank" rel="noopener noreferrer">Arduino IDE (oficial)</a><br/>
+            - <a href="https://www.wch-ic.com/downloads/ch341ser_exe.html" target="_blank" rel="noopener noreferrer">Driver CH340/CH341 (WCH)</a><br/>
+            - <a href="https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html" target="_blank" rel="noopener noreferrer">ESP32 (Espressif Docs)</a>
+          </p>
+        </div>
+
+        <div class="mini">
+          <h4>Tip de laboratorio</h4>
+          <p>
+            Antes de “reinstalar todo”, cambia el cable USB. Es la solución más humilde…
+            y estadísticamente la más efectiva.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-row">
+        <div>© Dr. Iroel Heredia 2026</div>
+        <div>Universidad Iberoamericana · Curso Arduino (sitio local)</div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Introducción — Curso Arduino | Universidad Iberoamericana</title>
+  <meta name="description" content="Introducción al curso de Arduino: historia, qué es Arduino, ecosistema, alternativas como ESP32 y Raspberry Pi, y diferencias entre microcontroladores y microprocesadores." />
+  <style>
+    :root{
+      --ibero-red: #C8102E;
+
+      --bg: #0B0F14;
+      --panel: #111827;
+      --panel2: #0F172A;
+      --text: #EAF0FA;
+      --muted: #A8B3C5;
+      --border: rgba(255,255,255,.10);
+      --shadow: 0 14px 40px rgba(0,0,0,.35);
+      --radius: 18px;
+
+      --max: 1120px;
+      --link: rgba(255,255,255,.92);
+    }
+
+    *{ box-sizing: border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(200,16,46,.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(90,160,255,.12), transparent 55%),
+        var(--bg);
+      line-height: 1.55;
+    }
+
+    a{ color: var(--link); text-decoration: none; }
+    a:hover{ text-decoration: underline; text-decoration-color: rgba(255,255,255,.25); text-underline-offset: 3px; }
+    a:focus{ outline: 2px solid rgba(255,255,255,.35); outline-offset: 3px; border-radius: 12px; }
+
+    .topbar{ background: var(--ibero-red); height: 10px; width: 100%; }
+
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(11,15,20,.72);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .container{
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .header-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 16px;
+      padding: 14px 0;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 260px;
+    }
+
+    .brand-mark{
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.55));
+      box-shadow: 0 10px 26px rgba(200,16,46,.25);
+      display:grid;
+      place-items:center;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+
+    .brand-title{ font-weight: 800; font-size: 14px; letter-spacing: .2px; }
+    .brand-sub{ font-size: 12px; color: var(--muted); }
+
+    nav{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .navlink{
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(17,24,39,.55);
+      font-size: 13px;
+      color: var(--text);
+      transition: transform .12s ease, background .12s ease;
+      white-space: nowrap;
+    }
+    .navlink:hover{ transform: translateY(-1px); background: rgba(17,24,39,.85); text-decoration: none; }
+
+    main{ padding: 24px 0 36px; }
+
+    .hero{
+      background: linear-gradient(180deg, rgba(17,24,39,.86), rgba(15,23,42,.76));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position: relative;
+      padding: 22px;
+    }
+    .hero:before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(760px 260px at 10% 0%, rgba(200,16,46,.20), transparent 55%),
+        radial-gradient(560px 280px at 90% 20%, rgba(90,160,255,.18), transparent 55%);
+      pointer-events:none;
+    }
+    .hero > *{ position: relative; }
+
+    .breadcrumbs{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .crumb{ color: var(--muted); }
+    .crumb strong{ color: rgba(255,255,255,.86); font-weight: 700; }
+
+    h1{
+      margin: 0 0 10px;
+      font-size: clamp(22px, 2.6vw, 34px);
+      letter-spacing: -0.4px;
+      line-height: 1.15;
+    }
+    .lead{
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 78ch;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1fr 320px;
+      gap: 14px;
+      margin-top: 14px;
+      align-items:start;
+    }
+
+    .panel{
+      background: rgba(17,24,39,.70);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+
+    .content{ padding: 18px; }
+    .content h2{
+      margin: 18px 0 8px;
+      font-size: 18px;
+      letter-spacing: -0.2px;
+    }
+    .content h2:first-child{ margin-top: 0; }
+    .content p{ margin: 0 0 12px; color: rgba(255,255,255,.90); }
+    .content p.muted{ color: var(--muted); }
+
+    .callout{
+      border: 1px solid rgba(200,16,46,.28);
+      background: linear-gradient(180deg, rgba(200,16,46,.14), rgba(200,16,46,.06));
+      border-radius: 16px;
+      padding: 14px;
+      margin: 14px 0;
+      color: rgba(255,255,255,.92);
+    }
+
+    .aside{ padding: 14px; display:flex; flex-direction: column; gap: 12px; }
+    .mini{
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(11,15,20,.35);
+    }
+    .mini h3{
+      margin: 0 0 6px;
+      font-size: 13px;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.82);
+    }
+    .mini p{ margin: 0; font-size: 13px; color: var(--muted); }
+
+    .toc a{ display:block; padding: 9px 10px; border-radius: 12px; }
+    .toc a:hover{ background: rgba(255,255,255,.05); text-decoration: none; }
+
+    .badge-row{ display:flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      font-size: 12px;
+      color: rgba(255,255,255,.86);
+      white-space: nowrap;
+    }
+    .dot{
+      width: 8px; height: 8px; border-radius: 999px;
+      background: rgba(200,16,46,.95);
+      box-shadow: 0 0 0 3px rgba(200,16,46,.18);
+      flex: 0 0 auto;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(15,23,42,.55);
+      margin: 12px 0 16px;
+    }
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+    th, td{
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      vertical-align: top;
+      font-size: 13px;
+      color: rgba(255,255,255,.90);
+    }
+    th{
+      text-align: left;
+      color: rgba(255,255,255,.82);
+      background: rgba(255,255,255,.04);
+      position: sticky;
+      top: 0;
+    }
+    td small{ color: var(--muted); display:block; margin-top: 4px; }
+
+    .nextprev{
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      font-weight: 700;
+      font-size: 13px;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); text-decoration: none; }
+    .btn-primary{
+      background: linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.75));
+      border-color: rgba(200,16,46,.35);
+      box-shadow: 0 12px 28px rgba(200,16,46,.22);
+    }
+
+    footer{
+      border-top: 1px solid var(--border);
+      background: rgba(11,15,20,.72);
+      padding: 16px 0;
+    }
+    .footer-row{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 980px){
+      .layout{ grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px){
+      .header-row{ align-items: flex-start; flex-direction: column; }
+      nav{ justify-content: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar" aria-hidden="true"></div>
+
+  <header>
+    <div class="container">
+      <div class="header-row">
+        <div class="brand" aria-label="Encabezado del curso">
+          <div class="brand-mark" aria-hidden="true">A</div>
+          <div>
+            <div class="brand-title">Arduino — Curso Base</div>
+            <div class="brand-sub">Universidad Iberoamericana</div>
+          </div>
+        </div>
+
+        <nav aria-label="Navegación principal">
+          <a class="navlink" href="index.html">Home</a>
+          <a class="navlink" href="introduccion.html" aria-current="page">Introducción</a>
+          <a class="navlink" href="instalacion.html">Instalación</a>
+          <a class="navlink" href="https://docs.arduino.cc/" target="_blank" rel="noopener noreferrer">Docs Arduino (externo)</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" aria-label="Introducción del curso">
+      <div class="breadcrumbs">
+        <span class="crumb"><a href="index.html">Home</a></span>
+        <span class="crumb">/</span>
+        <span class="crumb"><strong>Introducción</strong></span>
+      </div>
+      <h1>Introducción: Arduino, su historia y el mapa del “hardware para prototipar”</h1>
+      <p class="lead">
+        Antes de encender LEDs como si fueran luces navideñas, conviene entender qué es Arduino, por qué existe,
+        qué tipo de dispositivo es (y qué no es), y cómo se relaciona con otros “clásicos modernos” como ESP32 o Raspberry Pi.
+      </p>
+      <div class="badge-row" aria-label="Etiquetas">
+        <span class="badge"><span class="dot"></span> Fundamentos</span>
+        <span class="badge">Lectura larga</span>
+        <span class="badge">Microcontroladores vs Microprocesadores</span>
+      </div>
+    </section>
+
+    <section class="layout" aria-label="Contenido principal y navegación">
+      <!-- CONTENIDO -->
+      <article class="panel content">
+        <h2 id="historia">1) Historia de Arduino: de la educación al estándar cultural</h2>
+        <p>
+          Arduino nació de una necesidad muy concreta: hacer que la electrónica y la programación fueran accesibles para
+          estudiantes y creadores que no necesariamente eran ingenieros. En un contexto académico, se buscaba una plataforma
+          sencilla, económica y amable para prototipar: conectar sensores, controlar actuadores, crear interacciones y
+          aprender “haciendo”, sin que el primer obstáculo fuera la complejidad del hardware o la barrera del software.
+        </p>
+        <p>
+          Su origen se suele ubicar en Italia, en el entorno del Interaction Design Institute Ivrea, donde se
+          venía trabajando con enfoques de diseño e interacción y donde existía el interés por herramientas
+          abiertas (open-source) y didácticas. Arduino heredó una idea poderosa: si bajas el costo, simplificas el arranque,
+          y documentas bien, la gente se atreve a experimentar. Y cuando mucha gente se atreve a experimentar, el conocimiento
+          se multiplica más rápido que cualquier manual.
+        </p>
+        <p>
+          Con el tiempo, Arduino dejó de ser solo “una placa” y se volvió un ecosistema: placas oficiales y compatibles,
+          una comunidad global, librerías, ejemplos, tutoriales, shields, sensores y módulos por montones. En términos prácticos,
+          Arduino terminó siendo para la electrónica lo que una bicicleta bien diseñada es para moverte en la ciudad: no es el
+          vehículo más rápido del mundo, pero es el que te permite empezar hoy, entender el camino, y llegar lejos con técnica y constancia.
+        </p>
+
+        <div class="callout">
+          <strong>Idea clave:</strong> Arduino no es magia; es una combinación de hardware accesible + software sencillo + comunidad.
+          Es la “puerta principal” para aprender a controlar el mundo físico con código.
+        </div>
+
+        <h2 id="que-es">2) ¿Qué es Arduino (en serio)?</h2>
+        <p>
+          Arduino es una plataforma de prototipado electrónico basada, principalmente, en <strong>microcontroladores</strong>.
+          En la práctica, cuando alguien dice “tengo un Arduino”, suele referirse a una <em>placa</em> (por ejemplo UNO, Nano, Mega)
+          que integra un microcontrolador, pines de entrada/salida, reguladores de energía y conectores que facilitan conectar componentes.
+          Pero Arduino también es el <strong>Arduino IDE</strong> (o el ecosistema de herramientas compatibles) para escribir y cargar
+          programas (sketches) en la placa.
+        </p>
+        <p>
+          Su lógica de uso es directa: escribes un programa, lo compilas, lo subes a la placa, y el microcontrolador ejecuta el programa
+          una y otra vez. No necesitas “abrir una app” en la placa; la placa vive para ejecutar tu lógica. En lugar de pensar en ventanas,
+          procesos y multitarea como en una computadora personal, aquí el enfoque es: <strong>leer entradas</strong> (sensores, botones),
+          <strong>decidir</strong> (condicionales) y <strong>actuar</strong> (LEDs, motores, relevadores, servos).
+        </p>
+        <p>
+          Esto es perfecto para proyectos de interacción: domótica, arte electrónico, prototipos de producto, instalaciones, maquetas
+          con respuesta a estímulos, y mil variaciones más. Arduino se volvió popular precisamente porque reduce la fricción: menos tiempo
+          peleando con la herramienta, más tiempo probando ideas.
+        </p>
+
+        <h2 id="ecosistema">3) El ecosistema Arduino: por qué “funciona” para enseñar</h2>
+        <p>
+          Arduino se consolidó en educación por tres razones muy “de sentido común” (y por eso son tan efectivas):
+          <strong>documentación</strong>, <strong>comunidad</strong> y <strong>estandarización</strong>.
+          La documentación y ejemplos permiten que el alumno llegue a resultados temprano. La comunidad hace que casi cualquier duda
+          tenga precedentes. Y la estandarización (pines, shields, librerías) ayuda a replicar ejercicios y comparar resultados en clase.
+        </p>
+        <p>
+          Además, el modelo mental es claro: hay un ciclo típico de trabajo. Conectas circuito → subes programa → observas comportamiento →
+          ajustas variables → repites. Esa repetición constante desarrolla criterio: el alumno aprende a depurar (debug) sin trauma.
+          Y sí, se vuelve una especie de “arte marcial”: al inicio te tropiezas con el cable GND, luego lo saludas con respeto.
+        </p>
+
+        <h2 id="otros-dispositivos">4) Arduino no está solo: ESP32 y Raspberry Pi (y por qué conviene conocerlos)</h2>
+        <p>
+          Arduino es una entrada excelente, pero el mundo real te va a pedir, tarde o temprano, otras herramientas.
+          Dos nombres que aparecen muchísimo en prototipado contemporáneo son <strong>ESP32</strong> y <strong>Raspberry Pi</strong>.
+          No son “mejor o peor” por default; son diferentes y responden a necesidades distintas.
+        </p>
+
+        <h3 style="margin:14px 0 6px;font-size:16px;letter-spacing:-0.2px;">ESP32: microcontrolador moderno con conectividad</h3>
+        <p>
+          ESP32 (de Espressif) es una familia de microcontroladores muy popular porque integra, según el modelo, conectividad como
+          <strong>Wi-Fi</strong> y <strong>Bluetooth</strong> dentro del propio chip. Eso lo vuelve muy atractivo para IoT:
+          sensores que reportan datos, actuadores que reciben comandos remotos, y prototipos que “hablan” con apps o servicios.
+          En otras palabras: si tu proyecto necesita conectividad sin complicarte con módulos extra, ESP32 suele aparecer como candidato natural.
+        </p>
+        <p class="muted">
+          En este curso empezamos con Arduino para dominar fundamentos. Después, migrar a ESP32 se vuelve más fácil (y hasta divertido),
+          porque ya entiendes entradas, salidas y lógica de control.
+        </p>
+
+        <h3 style="margin:14px 0 6px;font-size:16px;letter-spacing:-0.2px;">Raspberry Pi: computadora completa en una tarjeta</h3>
+        <p>
+          Raspberry Pi (la serie “clásica”, no la Pico) es un enfoque distinto: es una <strong>computadora de placa única</strong>
+          (single-board computer). Corre un sistema operativo (por ejemplo Linux), maneja procesos, red, almacenamiento,
+          y es capaz de hacer tareas “de computadora”: servidores web, visión por computadora, interfaces, programación en Python, etc.
+          Su potencia viene con otra complejidad: hay OS, hay actualizaciones, hay archivos, hay servicios… suena familiar porque,
+          básicamente, es una mini computadora.
+        </p>
+        <p>
+          Dicho así, se entiende el reparto de roles: un microcontrolador (Arduino/ESP32) es excelente para tareas de control directo
+          del mundo físico; una Raspberry Pi es excelente para tareas “tipo computadora” (procesamiento más pesado, servicios de red, UI),
+          y ambos pueden trabajar juntos como equipo.
+        </p>
+
+        <div class="callout">
+          <strong>Lectura rápida del ecosistema:</strong>
+          Arduino/ESP32 controlan el “cuerpo” (sensores/actuadores). Raspberry Pi es el “cerebro con escritorio” (OS, red, servicios, UI).
+        </div>
+
+        <h2 id="micro-vs-micro">5) Microcontroladores vs Microprocesadores: la diferencia que te ahorra semanas</h2>
+        <p>
+          Aquí está una de las distinciones más importantes de todo el curso, porque te evita confusiones típicas:
+          <strong>un microcontrolador</strong> suele integrar en un solo chip CPU + memoria + periféricos (I/O, temporizadores, etc.).
+          <strong>un microprocesador</strong>, en cambio, suele ser la unidad de procesamiento que necesita más componentes externos
+          (memoria, periféricos, y normalmente un sistema operativo) para funcionar como “computadora completa”.
+        </p>
+        <p>
+          En el mundo educativo, Arduino se asocia a microcontroladores porque su propósito es controlar cosas específicas y repetitivas:
+          leer sensores, prender/apagar salidas, generar PWM, manejar comunicación serial, etc. En el mundo de Raspberry Pi
+          (serie principal), se habla de microprocesadores porque está más orientada a computación general: multitarea, sistema operativo,
+          procesos, servicios, almacenamiento masivo, etc.
+        </p>
+
+        <div class="table-wrap" aria-label="Tabla comparativa microcontrolador vs microprocesador">
+          <table>
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>Microcontrolador (Arduino / ESP32)</th>
+                <th>Microprocesador (Raspberry Pi “clásica”)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Propósito típico</strong></td>
+                <td>Control dedicado del mundo físico: entradas/salidas, tiempo real, tareas repetitivas.</td>
+                <td>Computación general: correr OS, procesos, servicios, interfaces, tareas más pesadas.</td>
+              </tr>
+              <tr>
+                <td><strong>Arquitectura (en términos prácticos)</strong></td>
+                <td>CPU + memoria + periféricos integrados en un chip (microcomputadora compacta).</td>
+                <td>CPU como núcleo de computación que depende de memoria/almacenamiento y entorno tipo computadora.</td>
+              </tr>
+              <tr>
+                <td><strong>Sistema operativo</strong></td>
+                <td>No es necesario. Ejecuta firmware (tu programa) normalmente en bucle.</td>
+                <td>Normalmente sí: Linux u otros, con multitarea real y gestión de recursos.</td>
+              </tr>
+              <tr>
+                <td><strong>Tiempo real</strong></td>
+                <td>Muy adecuado para control con tiempos predecibles (depende del diseño del programa).</td>
+                <td>Puede hacerlo, pero el OS y procesos pueden introducir latencias (hay soluciones, pero sube complejidad).</td>
+              </tr>
+              <tr>
+                <td><strong>Consumo y costo</strong></td>
+                <td>Suele ser menor, ideal para proyectos alimentados por batería o bajo consumo.</td>
+                <td>Suele ser mayor, más potencia y más capacidades tipo PC.</td>
+              </tr>
+              <tr>
+                <td><strong>Ejemplo típico</strong></td>
+                <td>Sensor de luz que controla un LED o un motor con una lógica simple.</td>
+                <td>Servidor web local, cámara + visión por computadora, dashboard, procesamiento de datos.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          En la práctica, la pregunta que te conviene hacer no es “¿cuál es mejor?”, sino:
+          <strong>¿qué tipo de problema estoy resolviendo?</strong>
+          Si necesitas reacción rápida y control directo, un microcontrolador es natural. Si necesitas ejecutar software complejo,
+          interfaces y servicios, una computadora en miniatura (tipo Raspberry Pi) es ideal. Y cuando un proyecto crece, lo elegante
+          es combinar: microcontrolador para I/O + Raspberry Pi para la capa “inteligente” y de red.
+        </p>
+
+        <h2 id="cierre">6) Cierre: por qué empezamos aquí</h2>
+        <p>
+          Este curso inicia con Arduino porque es el terreno perfecto para construir fundamentos sin distracciones:
+          aprenderás a distinguir señales digitales y análogas, a leer sensores, a controlar actuadores, y a escribir lógica clara.
+          Con eso, más adelante puedes brincar a ESP32 (IoT) o a Raspberry Pi (computación) sin sentir que cambiaste de planeta.
+        </p>
+        <p class="muted">
+          Siguiente tema recomendado: <strong>Instalación</strong> — porque un curso no empieza con “Hola Mundo”,
+          empieza con “Hola, driver que no quiere cooperar”.
+        </p>
+
+        <div class="nextprev" aria-label="Navegación siguiente anterior">
+          <a class="btn" href="index.html">← Volver a Home</a>
+          <a class="btn btn-primary" href="instalacion.html">Siguiente: Instalación →</a>
+        </div>
+      </article>
+
+      <!-- ASIDE -->
+      <aside class="panel aside" aria-label="Navegación y recursos">
+        <div class="mini toc" aria-label="Tabla de contenidos">
+          <h3>En esta página</h3>
+          <a href="#historia">1) Historia de Arduino</a>
+          <a href="#que-es">2) ¿Qué es Arduino?</a>
+          <a href="#ecosistema">3) Ecosistema Arduino</a>
+          <a href="#otros-dispositivos">4) ESP32 y Raspberry Pi</a>
+          <a href="#micro-vs-micro">5) Microcontrolador vs Microprocesador</a>
+          <a href="#cierre">6) Cierre</a>
+        </div>
+
+        <div class="mini" aria-label="Recursos externos">
+          <h3>Recursos (externos)</h3>
+          <p>
+            - <a href="https://docs.arduino.cc/" target="_blank" rel="noopener noreferrer">Arduino Docs</a><br/>
+            - <a href="https://www.arduino.cc/en/software" target="_blank" rel="noopener noreferrer">Arduino IDE</a><br/>
+            - <a href="https://www.espressif.com/en/products/socs/esp32" target="_blank" rel="noopener noreferrer">ESP32 (Espressif)</a><br/>
+            - <a href="https://www.raspberrypi.com/documentation/" target="_blank" rel="noopener noreferrer">Raspberry Pi Docs</a>
+          </p>
+        </div>
+
+        <div class="mini" aria-label="Tip didáctico">
+          <h3>Tip didáctico</h3>
+          <p>
+            En clase, la frase útil es: “Arduino controla”, “Raspberry Pi computa”.
+            Es simplificación… pero es una simplificación que ahorra dolores de cabeza.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-row">
+        <div>© Dr. Iroel Heredia 2026</div>
+        <div>Universidad Iberoamericana · Curso Arduino (sitio local)</div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

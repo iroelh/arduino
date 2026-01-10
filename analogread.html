@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Programación por Condicionante Análogo (analogRead) — Curso Arduino | Universidad Iberoamericana</title>
+  <meta name="description" content="analogRead en Arduino: potenciómetro y LDR, ADC 0–1023, variaciones de LDR, map() a PWM y ejercicio por umbrales con LEDs." />
+  <style>
+    :root{
+      --ibero-red:#C8102E;
+      --bg:#0B0F14;
+      --panel:#111827;
+      --panel2:#0F172A;
+      --text:#EAF0FA;
+      --muted:#A8B3C5;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 14px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --max:1120px;
+      --link:rgba(255,255,255,.92);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(200,16,46,.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(90,160,255,.12), transparent 55%),
+        var(--bg);
+      line-height:1.55;
+    }
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
+    a:focus{outline:2px solid rgba(255,255,255,.35);outline-offset:3px;border-radius:12px}
+
+    .topbar{background:var(--ibero-red);height:10px;width:100%}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(11,15,20,.72);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
+    .header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+    .brand{display:flex;align-items:center;gap:12px;min-width:260px;}
+    .brand-mark{
+      width:40px;height:40px;border-radius:12px;
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.55));
+      box-shadow:0 10px 26px rgba(200,16,46,.25);
+      display:grid;place-items:center;font-weight:800;letter-spacing:.5px;
+    }
+    .brand-title{font-weight:800;font-size:14px;letter-spacing:.2px}
+    .brand-sub{font-size:12px;color:var(--muted)}
+    nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .navlink{
+      padding:10px 12px;border:1px solid var(--border);border-radius:999px;
+      background:rgba(17,24,39,.55);font-size:13px;color:var(--text);
+      transition:transform .12s ease, background .12s ease;white-space:nowrap;
+    }
+    .navlink:hover{transform:translateY(-1px);background:rgba(17,24,39,.85);text-decoration:none}
+
+    main{padding:24px 0 36px}
+
+    .hero{
+      background:linear-gradient(180deg, rgba(17,24,39,.86), rgba(15,23,42,.76));
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+      position:relative;
+      padding:22px;
+    }
+    .hero:before{
+      content:"";position:absolute;inset:0;
+      background:
+        radial-gradient(760px 260px at 10% 0%, rgba(200,16,46,.20), transparent 55%),
+        radial-gradient(560px 280px at 90% 20%, rgba(90,160,255,.18), transparent 55%);
+      pointer-events:none;
+    }
+    .hero > *{position:relative}
+    .breadcrumbs{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:10px}
+    .crumb{color:var(--muted)}
+    .crumb strong{color:rgba(255,255,255,.86);font-weight:700}
+    h1{margin:0 0 10px;font-size:clamp(22px,2.6vw,34px);letter-spacing:-.4px;line-height:1.15}
+    .lead{margin:0;color:var(--muted);font-size:14px;max-width:100ch}
+
+    .layout{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-top:14px;align-items:start}
+    .panel{
+      background:rgba(17,24,39,.70);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .content{padding:18px}
+    .content h2{margin:18px 0 8px;font-size:18px;letter-spacing:-.2px}
+    .content h2:first-child{margin-top:0}
+    .content h3{margin:14px 0 6px;font-size:16px;letter-spacing:-.2px}
+    .content p{margin:0 0 12px;color:rgba(255,255,255,.90)}
+    .content ul{margin:0 0 12px;padding-left:18px;color:rgba(255,255,255,.90)}
+    .content li{margin:6px 0}
+    .content p.muted{color:var(--muted)}
+    code,kbd{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:12px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      padding:2px 6px;
+      border-radius:8px;
+      color:rgba(255,255,255,.92);
+    }
+
+    .callout{
+      border:1px solid rgba(200,16,46,.28);
+      background:linear-gradient(180deg, rgba(200,16,46,.14), rgba(200,16,46,.06));
+      border-radius:16px;
+      padding:14px;
+      margin:14px 0;
+      color:rgba(255,255,255,.92);
+    }
+
+    .codeblock{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(15,23,42,.60);
+      border-radius:16px;
+      overflow:auto;
+      margin:12px 0 16px;
+    }
+    pre{
+      margin:0;
+      padding:14px;
+      font-size:12.5px;
+      line-height:1.45;
+      color:rgba(255,255,255,.92);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      white-space:pre;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:rgba(15,23,42,.55);
+      margin:12px 0 16px;
+    }
+    table{width:100%;border-collapse:collapse;min-width:820px}
+    th,td{
+      padding:12px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      vertical-align:top;
+      font-size:13px;
+      color:rgba(255,255,255,.90);
+    }
+    th{
+      text-align:left;
+      color:rgba(255,255,255,.82);
+      background:rgba(255,255,255,.04);
+      position:sticky;top:0;
+    }
+    td small{color:var(--muted);display:block;margin-top:4px}
+
+    .aside{padding:14px;display:flex;flex-direction:column;gap:12px}
+    .mini{
+      padding:14px;border-radius:16px;border:1px solid var(--border);
+      background:rgba(11,15,20,.35);
+    }
+    .mini h4{
+      margin:0 0 6px;font-size:13px;letter-spacing:.2px;text-transform:uppercase;
+      color:rgba(255,255,255,.82);
+    }
+    .mini p{margin:0;font-size:13px;color:var(--muted)}
+    .toc a{display:block;padding:9px 10px;border-radius:12px}
+    .toc a:hover{background:rgba(255,255,255,.05);text-decoration:none}
+
+    .nextprev{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:11px 14px;border-radius:14px;border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      font-weight:800;font-size:13px;
+      transition:transform .12s ease, background .12s ease;
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.10);text-decoration:none}
+    .btn-primary{
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.75));
+      border-color:rgba(200,16,46,.35);
+      box-shadow:0 12px 28px rgba(200,16,46,.22);
+    }
+
+    footer{
+      border-top:1px solid var(--border);
+      background:rgba(11,15,20,.72);
+      padding:16px 0;
+    }
+    .footer-row{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      color:var(--muted);font-size:12px;
+    }
+
+    @media (max-width:980px){ .layout{grid-template-columns:1fr} }
+    @media (max-width:620px){
+      .header-row{align-items:flex-start;flex-direction:column}
+      nav{justify-content:flex-start}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar" aria-hidden="true"></div>
+
+  <header>
+    <div class="container">
+      <div class="header-row">
+        <div class="brand" aria-label="Encabezado del curso">
+          <div class="brand-mark" aria-hidden="true">A</div>
+          <div>
+            <div class="brand-title">Arduino — Curso Base</div>
+            <div class="brand-sub">Universidad Iberoamericana</div>
+          </div>
+        </div>
+
+        <nav aria-label="Navegación principal">
+          <a class="navlink" href="index.html">Home</a>
+          <a class="navlink" href="digitalread.html">digitalRead</a>
+          <a class="navlink" href="analogread.html" aria-current="page">analogRead</a>
+          <a class="navlink" href="ifs.html">Condicionantes múltiples</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" aria-label="analogRead">
+      <div class="breadcrumbs">
+        <span class="crumb"><a href="index.html">Home</a></span>
+        <span class="crumb">/</span>
+        <span class="crumb"><strong>Condicionante Análogo (analogRead)</strong></span>
+      </div>
+
+      <h1>analogRead(): leer el mundo “en escala de grises”</h1>
+      <p class="lead">
+        Si <code>digitalRead</code> responde “sí/no”, <code>analogRead</code> responde “¿cuánto?”.
+        Un potenciómetro y un LDR son los ejemplos perfectos: entregan un voltaje variable que Arduino convierte
+        en un número. Aquí lo usamos para controlar brillo (PWM) y para un ejercicio por umbrales.
+      </p>
+    </section>
+
+    <section class="layout" aria-label="Contenido principal y navegación">
+      <article class="panel content">
+
+        <h2 id="adc">1) ¿Por qué analogRead va de 0 a 1023?</h2>
+        <p>
+          En placas como <strong>Arduino UNO</strong>, el convertidor análogo-digital (ADC) tiene <strong>10 bits</strong>.
+          Eso significa que puede representar la medición en <strong>2¹⁰ = 1024 niveles</strong>.
+          Por eso el rango es:
+        </p>
+        <ul>
+          <li><strong>0</strong> → cercano a 0V</li>
+          <li><strong>1023</strong> → cercano al voltaje de referencia (comúnmente 5V en UNO)</li>
+        </ul>
+        <div class="callout">
+          <strong>Traducción:</strong> El voltaje es continuo, pero Arduino lo “corta” en 1024 escalones.
+          Mientras más bits, más escalones (más detalle).
+        </div>
+
+        <h2 id="pot">2) Ejemplo A: Potenciómetro (lectura + control de brillo)</h2>
+        <p>
+          Un potenciómetro es una perilla que funciona como divisor de voltaje. Conecta:
+        </p>
+        <ul>
+          <li>Un extremo a <strong>5V</strong></li>
+          <li>El otro extremo a <strong>GND</strong></li>
+          <li>El pin central (wiper) a <strong>A0</strong></li>
+        </ul>
+        <p>
+          Para el brillo usaremos un LED en un pin con PWM (en UNO: 3, 5, 6, 9, 10, 11).
+          Importante: el brillo por PWM usa <code>analogWrite</code> y va de <strong>0 a 255</strong>.
+          Entonces haremos un mapeo de <strong>0–1023</strong> a <strong>0–255</strong>.
+        </p>
+
+        <div class="codeblock" role="region" aria-label="Potenciómetro controla brillo con map">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Tema: analogRead() — Potenciómetro controla brillo (PWM)
+// Autoría académica: Dr. Iroel Heredia (2026)
+//
+// Cableado:
+//   - Potenciómetro: extremo 1 a 5V, extremo 2 a GND, centro a A0
+//   - LED (con resistencia) en pin PWM 9 hacia GND
+// ------------------------------------------------------------
+
+const int potPin = A0;   // Entrada análoga del potenciómetro
+const int ledPin = 9;    // Pin PWM (en UNO: 3,5,6,9,10,11)
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);    // Para ver valores en el Monitor Serial (opcional pero recomendado)
+}
+
+void loop() {
+  int lectura = analogRead(potPin);             // 0..1023
+  int brillo  = map(lectura, 0, 1023, 0, 255);  // 0..255 (PWM)
+
+  analogWrite(ledPin, brillo);
+
+  // Debug / aprendizaje: ver números
+  Serial.print("Pot: ");
+  Serial.print(lectura);
+  Serial.print("  -> Brillo PWM: ");
+  Serial.println(brillo);
+
+  delay(20); // Pequeña pausa para que el monitor serial sea legible
+}</code></pre>
+        </div>
+
+        <div class="callout">
+          <strong>¿Qué hace map()?</strong> Es una regla de tres automática:
+          convierte un rango de entrada (0–1023) en otro rango (0–255).
+          Así el movimiento de tu perilla se traduce en un brillo suave.
+        </div>
+
+        <h2 id="ldr">3) Ejemplo B: LDR (por qué cada una es distinta y cómo leerla)</h2>
+        <p>
+          Un <strong>LDR</strong> (fotoresistencia) cambia su resistencia según la luz:
+          con más luz suele bajar su resistencia; con menos luz suele subir.
+          El detalle clave: <strong>cada LDR es un individuo</strong>.
+          Dos LDR “iguales” pueden dar lecturas distintas por:
+        </p>
+        <ul>
+          <li>Tolerancias de fabricación (varía resistencia mínima/máxima)</li>
+          <li>Cómo está orientado y la luz que recibe (ángulo, distancia)</li>
+          <li>El resistor fijo que uses en el divisor de voltaje (10k, 47k, etc.)</li>
+          <li>Iluminación ambiente real (sombra, reflejos, luz artificial)</li>
+        </ul>
+        <p>
+          Por eso en proyectos reales se <strong>calibra</strong>: se observan valores en “mucha luz” y “poca luz”
+          y se decide un rango útil.
+        </p>
+
+        <h3 id="ldr-cableado">Cableado típico del LDR (divisor de voltaje)</h3>
+        <p>
+          Necesitas un divisor de voltaje: LDR + una resistencia fija (típico 10kΩ).
+          Una forma común:
+        </p>
+        <ul>
+          <li><strong>5V → LDR → (nodo) → Resistencia 10k → GND</strong></li>
+          <li>El (nodo) va a <strong>A0</strong></li>
+        </ul>
+
+        <div class="codeblock" role="region" aria-label="LDR lectura y control de brillo (calibración simple)">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Tema: analogRead() — LDR (fotoresistencia) + mapeo a brillo (PWM)
+// Autoría académica: Dr. Iroel Heredia (2026)
+//
+// Cableado (divisor de voltaje):
+//   5V -> LDR -> (A0) -> Resistencia (ej. 10k) -> GND
+// LED (con resistencia) en pin PWM 9 -> GND
+//
+// Nota: En algunos montajes, más luz da valores más altos;
+// en otros, más luz da valores más bajos. ¡Mide y confirma!
+// ------------------------------------------------------------
+
+const int ldrPin = A0;
+const int ledPin = 9;
+
+// Valores de calibración aproximados (AJUSTAR viendo el Monitor Serial)
+int ldrMin = 200;  // valor típico en mucha luz (ejemplo)
+int ldrMax = 900;  // valor típico en poca luz (ejemplo)
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int lectura = analogRead(ldrPin); // 0..1023
+
+  // Aseguramos que la lectura esté dentro de nuestro rango calibrado
+  int limitada = constrain(lectura, ldrMin, ldrMax);
+
+  // Queremos: a MENOS luz, MÁS brillo.
+  // Si poca luz = lectura alta, entonces invertimos el mapeo:
+  // (ldrMin..ldrMax) -> (255..0) o (0..255) según tu caso real.
+  //
+  // En este ejemplo asumimos:
+  //   mucha luz  ~ ldrMin (bajo)
+  //   poca luz   ~ ldrMax (alto)
+  // Entonces: poca luz (alto) => brillo alto (255)
+  int brillo = map(limitada, ldrMin, ldrMax, 0, 255);
+
+  analogWrite(ledPin, brillo);
+
+  Serial.print("LDR: ");
+  Serial.print(lectura);
+  Serial.print("  limitada: ");
+  Serial.print(limitada);
+  Serial.print("  -> brillo: ");
+  Serial.println(brillo);
+
+  delay(30);
+}</code></pre>
+        </div>
+
+        <div class="callout">
+          <strong>Clave:</strong> En LDR no memorices “más luz = número X”.
+          Primero observa tu montaje y define tus <code>ldrMin</code> y <code>ldrMax</code>.
+          La electrónica es consistente; la iluminación, no siempre.
+        </div>
+
+        <h2 id="umbrales">4) Ejercicio por umbrales: a menos luz, se encienden más LEDs</h2>
+        <p>
+          Aquí ya no queremos un brillo continuo, sino niveles (como un “medidor”):
+          si hay mucha luz se enciende 1 LED (o ninguno), y conforme baja la luz se encienden 2, 3 y 4.
+          Esto se logra con <strong>umbrales</strong>.
+        </p>
+
+        <p class="muted">
+          Nota: los umbrales dependen de tu LDR y de tu ambiente. Aquí ponemos números “de clase” para que arranque,
+          pero se ajustan observando lecturas reales.
+        </p>
+
+        <div class="codeblock" role="region" aria-label="LDR por umbrales enciende más LEDs con menos luz">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Tema: analogRead() — Ejercicio por UMBRALES con LDR
+// Autoría académica: Dr. Iroel Heredia (2026)
+//
+// Objetivo:
+//   A MENOS luz => se encienden MÁS LEDs (1,2,3,4)
+//
+// Cableado:
+//   - LDR en divisor a A0 (ver arriba)
+//   - LED1..LED4 (con resistencias) en pines 3,4,5,6 hacia GND
+// ------------------------------------------------------------
+
+const int ldrPin = A0;
+
+const int led1 = 3;
+const int led2 = 4;
+const int led3 = 5;
+const int led4 = 6;
+
+// Umbrales de ejemplo (AJUSTAR):
+// Suponiendo: mucha luz => valor bajo, poca luz => valor alto
+const int t1 = 300;  // arriba de esto ya empieza a "oscurecer"
+const int t2 = 500;
+const int t3 = 700;
+const int t4 = 850;
+
+void setup() {
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(led3, OUTPUT);
+  pinMode(led4, OUTPUT);
+
+  Serial.begin(9600);
+}
+
+void loop() {
+  int v = analogRead(ldrPin);
+
+  // Apagar todos primero (limpia el estado)
+  digitalWrite(led1, LOW);
+  digitalWrite(led2, LOW);
+  digitalWrite(led3, LOW);
+  digitalWrite(led4, LOW);
+
+  // Lógica por niveles:
+  // - Mucha luz (v bajo) => pocos LEDs
+  // - Poca luz (v alto)  => más LEDs
+  if (v >= t1) digitalWrite(led1, HIGH);
+  if (v >= t2) digitalWrite(led2, HIGH);
+  if (v >= t3) digitalWrite(led3, HIGH);
+  if (v >= t4) digitalWrite(led4, HIGH);
+
+  Serial.print("LDR: ");
+  Serial.println(v);
+
+  delay(50);
+}</code></pre>
+        </div>
+
+        <div class="callout">
+          <strong>Para calibrar rápido en clase:</strong><br/>
+          1) Abre el Monitor Serial y mira valores con luz normal.<br/>
+          2) Cubre el LDR con la mano y mira valores con poca luz.<br/>
+          3) Define <code>t1..t4</code> entre esos rangos para que el “medidor” se sienta natural.
+        </div>
+
+        <div class="nextprev" aria-label="Navegación siguiente anterior">
+          <a class="btn" href="digitalread.html">← Volver: digitalRead</a>
+          <a class="btn btn-primary" href="ifs.html">Siguiente: Condicionantes múltiples (If, If anidados) →</a>
+        </div>
+      </article>
+
+      <aside class="panel aside" aria-label="Navegación lateral">
+        <div class="mini toc">
+          <h4>En esta página</h4>
+          <a href="#adc">1) 0–1023 (ADC)</a>
+          <a href="#pot">2) Potenciómetro</a>
+          <a href="#ldr">3) LDR</a>
+          <a href="#umbrales">4) Umbrales con LEDs</a>
+        </div>
+
+        <div class="mini">
+          <h4>Dato práctico</h4>
+          <p>
+            PWM no es voltaje análogo real: es un “parpadeo rápido” que el ojo interpreta como brillo.
+            Por eso se siente continuo.
+          </p>
+        </div>
+
+        <div class="mini">
+          <h4>Advertencia amable</h4>
+          <p>
+            Si tus valores “no se parecen” a los del compañero, no es error:
+            su LDR es otro ser, su mesa tiene otra luz, y la realidad no firma constancias.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-row">
+        <div>© Dr. Iroel Heredia 2026</div>
+        <div>Universidad Iberoamericana · Curso Arduino (sitio local)</div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Programación por Condicionante Digital (digitalRead) — Curso Arduino | Universidad Iberoamericana</title>
+  <meta name="description" content="digitalRead en Arduino: leer un botón, encender LEDs, pull-up interno, antirrebote (debounce) y cambio de LED por cada pulsación." />
+  <style>
+    :root{
+      --ibero-red:#C8102E;
+      --bg:#0B0F14;
+      --panel:#111827;
+      --panel2:#0F172A;
+      --text:#EAF0FA;
+      --muted:#A8B3C5;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 14px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --max:1120px;
+      --link:rgba(255,255,255,.92);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(200,16,46,.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(90,160,255,.12), transparent 55%),
+        var(--bg);
+      line-height:1.55;
+    }
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
+    a:focus{outline:2px solid rgba(255,255,255,.35);outline-offset:3px;border-radius:12px}
+
+    .topbar{background:var(--ibero-red);height:10px;width:100%}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(11,15,20,.72);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
+    .header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+    .brand{display:flex;align-items:center;gap:12px;min-width:260px;}
+    .brand-mark{
+      width:40px;height:40px;border-radius:12px;
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.55));
+      box-shadow:0 10px 26px rgba(200,16,46,.25);
+      display:grid;place-items:center;font-weight:800;letter-spacing:.5px;
+    }
+    .brand-title{font-weight:800;font-size:14px;letter-spacing:.2px}
+    .brand-sub{font-size:12px;color:var(--muted)}
+    nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .navlink{
+      padding:10px 12px;border:1px solid var(--border);border-radius:999px;
+      background:rgba(17,24,39,.55);font-size:13px;color:var(--text);
+      transition:transform .12s ease, background .12s ease;white-space:nowrap;
+    }
+    .navlink:hover{transform:translateY(-1px);background:rgba(17,24,39,.85);text-decoration:none}
+
+    main{padding:24px 0 36px}
+
+    .hero{
+      background:linear-gradient(180deg, rgba(17,24,39,.86), rgba(15,23,42,.76));
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+      position:relative;
+      padding:22px;
+    }
+    .hero:before{
+      content:"";position:absolute;inset:0;
+      background:
+        radial-gradient(760px 260px at 10% 0%, rgba(200,16,46,.20), transparent 55%),
+        radial-gradient(560px 280px at 90% 20%, rgba(90,160,255,.18), transparent 55%);
+      pointer-events:none;
+    }
+    .hero > *{position:relative}
+    .breadcrumbs{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:10px}
+    .crumb{color:var(--muted)}
+    .crumb strong{color:rgba(255,255,255,.86);font-weight:700}
+    h1{margin:0 0 10px;font-size:clamp(22px,2.6vw,34px);letter-spacing:-.4px;line-height:1.15}
+    .lead{margin:0;color:var(--muted);font-size:14px;max-width:96ch}
+
+    .layout{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-top:14px;align-items:start}
+    .panel{
+      background:rgba(17,24,39,.70);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .content{padding:18px}
+    .content h2{margin:18px 0 8px;font-size:18px;letter-spacing:-.2px}
+    .content h2:first-child{margin-top:0}
+    .content h3{margin:14px 0 6px;font-size:16px;letter-spacing:-.2px}
+    .content p{margin:0 0 12px;color:rgba(255,255,255,.90)}
+    .content ul{margin:0 0 12px;padding-left:18px;color:rgba(255,255,255,.90)}
+    .content li{margin:6px 0}
+    .content p.muted{color:var(--muted)}
+    code,kbd{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:12px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      padding:2px 6px;
+      border-radius:8px;
+      color:rgba(255,255,255,.92);
+    }
+
+    .callout{
+      border:1px solid rgba(200,16,46,.28);
+      background:linear-gradient(180deg, rgba(200,16,46,.14), rgba(200,16,46,.06));
+      border-radius:16px;
+      padding:14px;
+      margin:14px 0;
+      color:rgba(255,255,255,.92);
+    }
+
+    .codeblock{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(15,23,42,.60);
+      border-radius:16px;
+      overflow:auto;
+      margin:12px 0 16px;
+    }
+    pre{
+      margin:0;
+      padding:14px;
+      font-size:12.5px;
+      line-height:1.45;
+      color:rgba(255,255,255,.92);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      white-space:pre;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:rgba(15,23,42,.55);
+      margin:12px 0 16px;
+    }
+    table{width:100%;border-collapse:collapse;min-width:760px}
+    th,td{
+      padding:12px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      vertical-align:top;
+      font-size:13px;
+      color:rgba(255,255,255,.90);
+    }
+    th{
+      text-align:left;
+      color:rgba(255,255,255,.82);
+      background:rgba(255,255,255,.04);
+      position:sticky;top:0;
+    }
+
+    .aside{padding:14px;display:flex;flex-direction:column;gap:12px}
+    .mini{
+      padding:14px;border-radius:16px;border:1px solid var(--border);
+      background:rgba(11,15,20,.35);
+    }
+    .mini h4{
+      margin:0 0 6px;font-size:13px;letter-spacing:.2px;text-transform:uppercase;
+      color:rgba(255,255,255,.82);
+    }
+    .mini p{margin:0;font-size:13px;color:var(--muted)}
+    .toc a{display:block;padding:9px 10px;border-radius:12px}
+    .toc a:hover{background:rgba(255,255,255,.05);text-decoration:none}
+
+    .nextprev{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:11px 14px;border-radius:14px;border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      font-weight:800;font-size:13px;
+      transition:transform .12s ease, background .12s ease;
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.10);text-decoration:none}
+    .btn-primary{
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.75));
+      border-color:rgba(200,16,46,.35);
+      box-shadow:0 12px 28px rgba(200,16,46,.22);
+    }
+
+    footer{
+      border-top:1px solid var(--border);
+      background:rgba(11,15,20,.72);
+      padding:16px 0;
+    }
+    .footer-row{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      color:var(--muted);font-size:12px;
+    }
+
+    @media (max-width:980px){ .layout{grid-template-columns:1fr} }
+    @media (max-width:620px){
+      .header-row{align-items:flex-start;flex-direction:column}
+      nav{justify-content:flex-start}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar" aria-hidden="true"></div>
+
+  <header>
+    <div class="container">
+      <div class="header-row">
+        <div class="brand" aria-label="Encabezado del curso">
+          <div class="brand-mark" aria-hidden="true">A</div>
+          <div>
+            <div class="brand-title">Arduino — Curso Base</div>
+            <div class="brand-sub">Universidad Iberoamericana</div>
+          </div>
+        </div>
+
+        <nav aria-label="Navegación principal">
+          <a class="navlink" href="index.html">Home</a>
+          <a class="navlink" href="digitalwrite.html">digitalWrite</a>
+          <a class="navlink" href="digitalread.html" aria-current="page">digitalRead</a>
+          <a class="navlink" href="analogread.html">analogRead</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" aria-label="digitalRead">
+      <div class="breadcrumbs">
+        <span class="crumb"><a href="index.html">Home</a></span>
+        <span class="crumb">/</span>
+        <span class="crumb"><strong>Condicionante Digital (digitalRead)</strong></span>
+      </div>
+
+      <h1>digitalRead(): leer un botón y tomar decisiones</h1>
+      <p class="lead">
+        <code>digitalRead(pin)</code> te devuelve <strong>HIGH</strong> o <strong>LOW</strong> según el estado de un pin configurado
+        como entrada. Es la base para botones, switches y sensores “sí/no”. Hoy usaremos un botón para: (1) encender un LED, y
+        (2) cambiar de LED 1→2→3→4 con cada pulsación, apagando los anteriores.
+      </p>
+    </section>
+
+    <section class="layout" aria-label="Contenido principal y navegación">
+      <!-- CONTENIDO -->
+      <article class="panel content">
+
+        <h2 id="cableado">0) Cableado recomendado (simple y confiable)</h2>
+        <p>
+          Vamos a usar el <strong>pull-up interno</strong> de Arduino. Es decir:
+        </p>
+        <ul>
+          <li>El pin del botón se configura como <code>INPUT_PULLUP</code>.</li>
+          <li>Un lado del botón va al pin (por ejemplo D2).</li>
+          <li>El otro lado del botón va a <strong>GND</strong>.</li>
+        </ul>
+
+        <div class="callout">
+          Con <code>INPUT_PULLUP</code>, el botón se lee al revés de lo “intuitivo”:
+          <strong>sin presionar = HIGH</strong>, <strong>presionado = LOW</strong>.
+          No es brujería: es electrónica ordenada.
+        </div>
+
+        <h2 id="ej1">1) Ejemplo 1: Un botón enciende un LED (mientras lo mantengo presionado)</h2>
+        <p>
+          Este es el comportamiento más directo: si el botón está presionado, enciendo el LED; si no, lo apago.
+          No “recuerda” estados: solo reacciona.
+        </p>
+
+        <div class="codeblock" role="region" aria-label="Código botón enciende LED">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Tema: digitalRead() — Botón que enciende un LED
+// Autoría académica: Dr. Iroel Heredia (2026)
+// Cableado recomendado:
+//   - Botón entre D2 y GND
+//   - LED (con resistencia) en D13 o usar LED_BUILTIN
+// Nota: INPUT_PULLUP => suelto = HIGH, presionado = LOW
+// ------------------------------------------------------------
+
+const int boton = 2;              // Pin del botón
+const int led   = LED_BUILTIN;    // LED integrado (o cambia a un pin como 13)
+
+void setup() {
+  pinMode(boton, INPUT_PULLUP);   // Activamos pull-up interno
+  pinMode(led, OUTPUT);           // LED como salida
+}
+
+void loop() {
+  int estado = digitalRead(boton);   // Leemos el botón
+
+  // Como usamos INPUT_PULLUP:
+  // - Presionado => LOW
+  // - Suelto     => HIGH
+  if (estado == LOW) {
+    digitalWrite(led, HIGH);         // Botón presionado => LED encendido
+  } else {
+    digitalWrite(led, LOW);          // Botón suelto => LED apagado
+  }
+}</code></pre>
+        </div>
+
+        <h2 id="debounce">2) Antes del ejemplo 2: ¿Por qué a veces “cuenta doble”? (debounce)</h2>
+        <p>
+          Un botón mecánico no hace un cambio perfecto de ON a OFF: al presionar, los contactos “rebotan” milésimas de segundo
+          y se generan varias transiciones rápidas. Para el ojo humano es una sola pulsación, pero para Arduino pueden ser varias.
+          Por eso usamos <strong>antirrebote</strong> (debounce).
+        </p>
+        <p class="muted">
+          Aquí implementamos un debounce por tiempo usando <code>millis()</code> (sin congelar el programa con delays largos).
+        </p>
+
+        <h2 id="ej2">3) Ejemplo 2: Cada pulsación cambia el LED 1→2→3→4 (apagando los anteriores)</h2>
+        <p>
+          Este ejemplo ya “recuerda” en qué LED va. Cada vez que detecta una pulsación válida, avanza al siguiente LED.
+          Solo uno queda encendido a la vez: al encender el nuevo, apaga los demás.
+        </p>
+
+        <div class="table-wrap" aria-label="Conexión sugerida de LEDs">
+          <table>
+            <thead>
+              <tr>
+                <th>LED</th>
+                <th>Pin sugerido</th>
+                <th>Nota</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>LED 1</strong></td><td>D3</td><td>Con resistencia en serie (ej. 220Ω–330Ω)</td></tr>
+              <tr><td><strong>LED 2</strong></td><td>D4</td><td>Con resistencia</td></tr>
+              <tr><td><strong>LED 3</strong></td><td>D5</td><td>Con resistencia</td></tr>
+              <tr><td><strong>LED 4</strong></td><td>D6</td><td>Con resistencia</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="codeblock" role="region" aria-label="Código botón cambia LED 1 a 4 con debounce">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Tema: digitalRead() — Botón que cambia LED 1→2→3→4 (solo uno encendido)
+// Autoría académica: Dr. Iroel Heredia (2026)
+//
+// Cableado recomendado:
+//   - Botón entre D2 y GND
+//   - LEDs (con resistencias) en D3, D4, D5, D6 hacia GND
+//
+// Nota: INPUT_PULLUP => suelto = HIGH, presionado = LOW
+// Incluye debounce (antirrebote) por tiempo con millis()
+// ------------------------------------------------------------
+
+const int boton = 2;
+
+// LEDs (puedes cambiar pines si lo necesitas)
+const int led1 = 3;
+const int led2 = 4;
+const int led3 = 5;
+const int led4 = 6;
+
+// Variables para el debounce
+int ultimoEstadoBoton = HIGH;       // Estado previo leído (con pull-up inicia HIGH)
+unsigned long ultimoCambio = 0;     // Tiempo del último cambio
+const unsigned long debounceMs = 40; // Ventana típica 30–60 ms
+
+// Variable de “memoria”: qué LED está activo (0..3)
+int indiceLed = 0;
+
+void setup() {
+  pinMode(boton, INPUT_PULLUP);
+
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(led3, OUTPUT);
+  pinMode(led4, OUTPUT);
+
+  // Encendemos el primer LED al inicio (opcional)
+  encenderSolo(indiceLed);
+}
+
+void loop() {
+  int lectura = digitalRead(boton);
+
+  // Si la lectura cambió respecto a la última lectura registrada, reiniciamos temporizador
+  if (lectura != ultimoEstadoBoton) {
+    ultimoCambio = millis();
+    ultimoEstadoBoton = lectura;
+  }
+
+  // Si ya pasó el tiempo de debounce, aceptamos la lectura como estable
+  if ( (millis() - ultimoCambio) > debounceMs ) {
+
+    // Queremos detectar la “pulsación” como evento (no mantener presionado):
+    // Con pull-up: presionado = LOW.
+    // Entonces, el evento será cuando esté en LOW.
+    //
+    // Para que no cuente múltiples veces mientras lo mantienes presionado,
+    // esperamos a que suelte (HIGH) antes de permitir otro conteo.
+    //
+    // Implementamos un “candado” muy simple con una variable estática.
+    static bool listoParaContar = true;
+
+    if (lectura == LOW && listoParaContar) {
+      // Evento: se presionó el botón (pulsación válida)
+      indiceLed = indiceLed + 1;
+
+      // Si se pasó de 3, regresa a 0 (ciclo 1→2→3→4→1…)
+      if (indiceLed > 3) {
+        indiceLed = 0;
+      }
+
+      encenderSolo(indiceLed);
+
+      // Bloqueamos conteo hasta que suelte el botón
+      listoParaContar = false;
+    }
+
+    if (lectura == HIGH) {
+      // Si ya soltó, habilitamos el conteo para la próxima pulsación
+      listoParaContar = true;
+    }
+  }
+}
+
+// Función auxiliar: apaga todos y enciende solo el LED indicado
+void encenderSolo(int idx) {
+  // Apagar todos
+  digitalWrite(led1, LOW);
+  digitalWrite(led2, LOW);
+  digitalWrite(led3, LOW);
+  digitalWrite(led4, LOW);
+
+  // Encender solo el seleccionado
+  if (idx == 0) digitalWrite(led1, HIGH);
+  if (idx == 1) digitalWrite(led2, HIGH);
+  if (idx == 2) digitalWrite(led3, HIGH);
+  if (idx == 3) digitalWrite(led4, HIGH);
+}</code></pre>
+        </div>
+
+        <div class="callout">
+          <strong>Qué aprender aquí:</strong><br/>
+          1) El botón es una entrada digital (HIGH/LOW).<br/>
+          2) “Pulsación” es un evento, no un estado sostenido.<br/>
+          3) Debounce evita dobles conteos (la realidad vibra; el código pone orden).<br/>
+          4) Una variable (<code>indiceLed</code>) funciona como memoria simple.
+        </div>
+
+        <div class="nextprev" aria-label="Navegación siguiente anterior">
+          <a class="btn" href="digitalwrite.html">← Volver: digitalWrite</a>
+          <a class="btn btn-primary" href="analogread.html">Siguiente: Condicionante Análogo (analogRead) →</a>
+        </div>
+      </article>
+
+      <!-- ASIDE -->
+      <aside class="panel aside" aria-label="Navegación lateral">
+        <div class="mini toc">
+          <h4>En esta página</h4>
+          <a href="#cableado">0) Cableado (pull-up)</a>
+          <a href="#ej1">1) Botón enciende LED</a>
+          <a href="#debounce">2) Debounce</a>
+          <a href="#ej2">3) Cambiar LED 1→4</a>
+        </div>
+
+        <div class="mini">
+          <h4>Errores típicos</h4>
+          <p>
+            - Olvidar que <code>INPUT_PULLUP</code> invierte lógica<br/>
+            - No compartir GND (botón y LEDs deben tener referencia común)<br/>
+            - No usar resistencia en LEDs<br/>
+            - Contar varias veces por rebote (debounce)
+          </p>
+        </div>
+
+        <div class="mini">
+          <h4>Tip rápido</h4>
+          <p>
+            Si tu botón “no sirve”, 70% de las veces es el cableado.
+            El otro 30%… también, pero con más confianza.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-row">
+        <div>© Dr. Iroel Heredia 2026</div>
+        <div>Universidad Iberoamericana · Curso Arduino (sitio local)</div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Digital vs Análogo — Curso Arduino | Universidad Iberoamericana</title>
+  <meta name="description" content="Diferencia entre señales digitales y análogas: discretas vs continuas, ejemplos, ADC/PWM, y cómo se usan en Arduino." />
+  <style>
+    :root{
+      --ibero-red:#C8102E;
+      --bg:#0B0F14;
+      --panel:#111827;
+      --panel2:#0F172A;
+      --text:#EAF0FA;
+      --muted:#A8B3C5;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 14px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --max:1120px;
+      --link:rgba(255,255,255,.92);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(200,16,46,.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(90,160,255,.12), transparent 55%),
+        var(--bg);
+      line-height:1.55;
+    }
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
+    a:focus{outline:2px solid rgba(255,255,255,.35);outline-offset:3px;border-radius:12px}
+
+    .topbar{background:var(--ibero-red);height:10px;width:100%}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(11,15,20,.72);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
+    .header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+    .brand{display:flex;align-items:center;gap:12px;min-width:260px;}
+    .brand-mark{
+      width:40px;height:40px;border-radius:12px;
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.55));
+      box-shadow:0 10px 26px rgba(200,16,46,.25);
+      display:grid;place-items:center;font-weight:800;letter-spacing:.5px;
+    }
+    .brand-title{font-weight:800;font-size:14px;letter-spacing:.2px}
+    .brand-sub{font-size:12px;color:var(--muted)}
+    nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .navlink{
+      padding:10px 12px;border:1px solid var(--border);border-radius:999px;
+      background:rgba(17,24,39,.55);font-size:13px;color:var(--text);
+      transition:transform .12s ease, background .12s ease;white-space:nowrap;
+    }
+    .navlink:hover{transform:translateY(-1px);background:rgba(17,24,39,.85);text-decoration:none}
+
+    main{padding:24px 0 36px}
+
+    .hero{
+      background:linear-gradient(180deg, rgba(17,24,39,.86), rgba(15,23,42,.76));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+      padding:22px;
+    }
+    .hero:before{
+      content:"";position:absolute;inset:0;
+      background:
+        radial-gradient(760px 260px at 10% 0%, rgba(200,16,46,.20), transparent 55%),
+        radial-gradient(560px 280px at 90% 20%, rgba(90,160,255,.18), transparent 55%);
+      pointer-events:none;
+    }
+    .hero > *{position:relative}
+    .breadcrumbs{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:10px}
+    .crumb{color:var(--muted)}
+    .crumb strong{color:rgba(255,255,255,.86);font-weight:700}
+    h1{margin:0 0 10px;font-size:clamp(22px,2.6vw,34px);letter-spacing:-.4px;line-height:1.15}
+    .lead{margin:0;color:var(--muted);font-size:14px;max-width:92ch}
+
+    .layout{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-top:14px;align-items:start}
+    .panel{
+      background:rgba(17,24,39,.70);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .content{padding:18px}
+    .content h2{margin:18px 0 8px;font-size:18px;letter-spacing:-.2px}
+    .content h2:first-child{margin-top:0}
+    .content h3{margin:14px 0 6px;font-size:16px;letter-spacing:-.2px}
+    .content p{margin:0 0 12px;color:rgba(255,255,255,.90)}
+    .content ul{margin:0 0 12px;padding-left:18px;color:rgba(255,255,255,.90)}
+    .content li{margin:6px 0}
+    .content p.muted{color:var(--muted)}
+
+    .callout{
+      border:1px solid rgba(200,16,46,.28);
+      background:linear-gradient(180deg, rgba(200,16,46,.14), rgba(200,16,46,.06));
+      border-radius:16px;
+      padding:14px;
+      margin:14px 0;
+      color:rgba(255,255,255,.92);
+    }
+
+    .aside{padding:14px;display:flex;flex-direction:column;gap:12px}
+    .mini{
+      padding:14px;border-radius:16px;border:1px solid var(--border);
+      background:rgba(11,15,20,.35);
+    }
+    .mini h4{
+      margin:0 0 6px;font-size:13px;letter-spacing:.2px;text-transform:uppercase;
+      color:rgba(255,255,255,.82);
+    }
+    .mini p{margin:0;font-size:13px;color:var(--muted)}
+    .toc a{display:block;padding:9px 10px;border-radius:12px}
+    .toc a:hover{background:rgba(255,255,255,.05);text-decoration:none}
+
+    .img-slot{
+      border:1px dashed rgba(255,255,255,.22);
+      border-radius:16px;
+      background:rgba(15,23,42,.35);
+      padding:14px;
+      margin:12px 0 16px;
+    }
+    .img-slot .label{
+      display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      font-size:12px;color:var(--muted);margin-bottom:10px;
+    }
+    .img-slot .box{
+      width:100%;
+      aspect-ratio: 16/9;
+      border-radius:12px;
+      background:rgba(255,255,255,.05);
+      display:grid;
+      place-items:center;
+      color:rgba(255,255,255,.70);
+      font-size:13px;
+    }
+    .img-slot small{display:block;margin-top:8px;color:var(--muted)}
+
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:rgba(15,23,42,.55);
+      margin:12px 0 16px;
+    }
+    table{width:100%;border-collapse:collapse;min-width:780px}
+    th,td{
+      padding:12px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      vertical-align:top;
+      font-size:13px;
+      color:rgba(255,255,255,.90);
+    }
+    th{
+      text-align:left;
+      color:rgba(255,255,255,.82);
+      background:rgba(255,255,255,.04);
+      position:sticky;top:0;
+    }
+    td small{color:var(--muted);display:block;margin-top:4px}
+
+    .nextprev{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:11px 14px;border-radius:14px;border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      font-weight:800;font-size:13px;
+      transition:transform .12s ease, background .12s ease;
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.10);text-decoration:none}
+    .btn-primary{
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.75));
+      border-color:rgba(200,16,46,.35);
+      box-shadow:0 12px 28px rgba(200,16,46,.22);
+    }
+
+    footer{
+      border-top:1px solid var(--border);
+      background:rgba(11,15,20,.72);
+      padding:16px 0;
+    }
+    .footer-row{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      color:var(--muted);font-size:12px;
+    }
+
+    @media (max-width:980px){ .layout{grid-template-columns:1fr} }
+    @media (max-width:620px){
+      .header-row{align-items:flex-start;flex-direction:column}
+      nav{justify-content:flex-start}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar" aria-hidden="true"></div>
+
+  <header>
+    <div class="container">
+      <div class="header-row">
+        <div class="brand" aria-label="Encabezado del curso">
+          <div class="brand-mark" aria-hidden="true">A</div>
+          <div>
+            <div class="brand-title">Arduino — Curso Base</div>
+            <div class="brand-sub">Universidad Iberoamericana</div>
+          </div>
+        </div>
+
+        <nav aria-label="Navegación principal">
+          <a class="navlink" href="index.html">Home</a>
+          <a class="navlink" href="instalacion.html">Instalación</a>
+          <a class="navlink" href="digital-vs-analogico.html" aria-current="page">Digital vs Análogo</a>
+          <a class="navlink" href="sensores-y-actuadores.html">Sensores y Actuadores</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" aria-label="Digital vs Análogo">
+      <div class="breadcrumbs">
+        <span class="crumb"><a href="index.html">Home</a></span>
+        <span class="crumb">/</span>
+        <span class="crumb"><strong>Digital vs Análogo</strong></span>
+      </div>
+
+      <h1>Digital vs Análogo: señales discretas y señales continuas</h1>
+      <p class="lead">
+        En Arduino (y en electrónica en general) casi todo se reduce a esto: <strong>medir señales</strong> y
+        <strong>producir señales</strong>. La gran diferencia es si esas señales se comportan como un “sí/no” (digital)
+        o como un “más/menos” gradual (análogas). Y sí: en la vida real casi siempre conviven.
+      </p>
+    </section>
+
+    <section class="layout" aria-label="Contenido principal y navegación">
+      <!-- CONTENIDO -->
+      <article class="panel content">
+
+        <h2 id="diferencia">1) La diferencia esencial</h2>
+        <p>
+          Una <strong>señal digital</strong> trabaja con <strong>estados discretos</strong>. En su versión más simple,
+          solo hay dos estados: <strong>0</strong> y <strong>1</strong> (LOW/HIGH). Es la lógica del interruptor:
+          encendido o apagado, verdadero o falso, hay o no hay.
+        </p>
+        <p>
+          Una <strong>señal análoga</strong> es <strong>continua</strong>: puede tomar muchos valores dentro de un rango.
+          Es la lógica del “gradiente”: más brillo, menos brillo; más presión, menos presión; más volumen, menos volumen.
+          No es binaria: es una variación progresiva.
+        </p>
+
+        <div class="callout">
+          <strong>Versión ultracorta:</strong> Digital = “categorías” (discreto). Análogo = “continuo” (gradual).
+          La realidad es análoga; los sistemas digitales la “miden” y la convierten en números.
+        </div>
+
+        <h2 id="grafica">2) Espacio para gráficas (para que lo vean clarísimo)</h2>
+        <p>
+          En clase es muy útil mostrar dos gráficas: una escalonada (digital) y una curva continua (análoga).
+          Aquí te dejo espacios listos para insertar imágenes (puedes reemplazar el recuadro por un <code>&lt;img src="..."&gt;</code>).
+        </p>
+
+        <div class="img-slot" aria-label="Espacio para imagen de señal digital">
+          <div class="label">
+            <span><strong>Imagen A:</strong> Señal digital (escalones / 0–1)</span>
+            <span>Reemplazar por <code>&lt;img&gt;</code> cuando la tengas</span>
+          </div>
+          <div class="box">[ Coloca aquí la gráfica de una señal digital ]</div>
+          <small>Sugerencia: una onda cuadrada o una línea que sube/baja entre 0V y 5V (o 3.3V).</small>
+        </div>
+
+        <div class="img-slot" aria-label="Espacio para imagen de señal análoga">
+          <div class="label">
+            <span><strong>Imagen B:</strong> Señal análoga (curva continua)</span>
+            <span>Reemplazar por <code>&lt;img&gt;</code> cuando la tengas</span>
+          </div>
+          <div class="box">[ Coloca aquí la gráfica de una señal análoga ]</div>
+          <small>Sugerencia: una onda seno, o una curva suave que sube y baja en el tiempo.</small>
+        </div>
+
+        <h2 id="ejemplos">3) Ejemplos cotidianos (sin electrónica todavía)</h2>
+        <p>
+          Los ejemplos del mundo real ayudan muchísimo porque hacen que el concepto sea intuitivo. Aquí van varios:
+        </p>
+
+        <div class="table-wrap" aria-label="Tabla de ejemplos digital vs análogo">
+          <table>
+            <thead>
+              <tr>
+                <th>Situación</th>
+                <th>Digital</th>
+                <th>Análogo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sonido</strong></td>
+                <td>¿Hay sonido o no hay sonido? (silencio vs sonido)</td>
+                <td>El <strong>volumen</strong> como gradiente: bajito ↔ fuerte</td>
+              </tr>
+              <tr>
+                <td><strong>Luz</strong></td>
+                <td>Foco apagado / encendido</td>
+                <td>Brillo: tenue ↔ intenso</td>
+              </tr>
+              <tr>
+                <td><strong>Temperatura</strong></td>
+                <td>“Está frío / está caliente” (clasificación por umbral)</td>
+                <td>°C como valor continuo: 18.2, 18.3, 18.4…</td>
+              </tr>
+              <tr>
+                <td><strong>Puerta</strong></td>
+                <td>Abierta / cerrada</td>
+                <td>Ángulo de apertura: 0° ↔ 90°</td>
+              </tr>
+              <tr>
+                <td><strong>Velocidad</strong></td>
+                <td>¿Se mueve o está detenido?</td>
+                <td>km/h o m/s como magnitud gradual</td>
+              </tr>
+              <tr>
+                <td><strong>Presión</strong></td>
+                <td>¿Se presionó el botón o no?</td>
+                <td>Fuerza aplicada: suave ↔ fuerte (por ejemplo, un sensor de fuerza)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          Nota importante: muchas situaciones “análogas” se vuelven “digitales” cuando definimos un umbral.
+          Por ejemplo, “si el volumen es mayor que X, entonces hay ruido”. En ese caso, tomas un mundo continuo
+          y lo conviertes en una decisión discreta para poder actuar con claridad.
+        </p>
+
+        <h2 id="arduino">4) ¿Cómo se traduce esto en Arduino?</h2>
+        <p>
+          Arduino trabaja con pines que pueden leerse/escribirse como <strong>digitales</strong> (HIGH/LOW) y pines
+          que pueden leerse como <strong>análogos</strong> mediante un convertidor ADC (Analog-to-Digital Converter).
+          En otras palabras: Arduino “entiende” números; cuando lees algo análogo, Arduino lo convierte a un número.
+        </p>
+
+        <h3 id="digital">4.1 Digital: señales discretas (HIGH/LOW)</h3>
+        <p>
+          Un pin digital es perfecto para botones, interruptores, sensores que dan salida tipo “on/off” o módulos
+          que ya te entregan un estado. Su ventaja es que es simple: no interpretas rangos, interpretas estados.
+        </p>
+        <ul>
+          <li><strong>Ejemplo típico:</strong> un botón. ¿Se presionó? Sí/No.</li>
+          <li><strong>Ejemplo típico:</strong> un sensor de presencia con salida digital. ¿Detecta? Sí/No.</li>
+          <li><strong>Actuación:</strong> prender o apagar un LED, activar/desactivar un relevador.</li>
+        </ul>
+
+        <h3 id="analog">4.2 Análogo: señales continuas convertidas a números (ADC)</h3>
+        <p>
+          Un pin análogo (por ejemplo A0) mide un voltaje dentro de un rango (según la placa) y lo convierte a un número.
+          Ese número no es “mágico”: es una representación discreta de algo que originalmente era continuo.
+          A mayor resolución del ADC, más “pasos” puede distinguir.
+        </p>
+        <ul>
+          <li><strong>Ejemplo típico:</strong> potenciómetro (una perilla): entrega un voltaje variable.</li>
+          <li><strong>Ejemplo típico:</strong> LDR (luz): entrega variación según iluminación (con circuito adecuado).</li>
+          <li><strong>Ejemplo típico:</strong> sensor de fuerza o flexión: cambia su resistencia y se mide como voltaje.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Traducción didáctica:</strong> El mundo es continuo (análogico), pero Arduino toma “muestras” y las vuelve números.
+          Por eso muchas veces ves valores como 0…1023, 0…4095, etc. (depende de la placa y su ADC).
+        </div>
+
+        <h2 id="pwm">5) El caso tramposo: PWM (parece análogo, pero es digital)</h2>
+        <p>
+          PWM (Modulación por Ancho de Pulso) es un truco elegante: el pin realmente está alternando muy rápido entre HIGH y LOW,
+          pero al variar el porcentaje de tiempo que está en HIGH (duty cycle), el promedio “se siente” como un valor intermedio.
+          Por eso un LED puede verse “a media intensidad” aunque el pin nunca esté en “2.5V real”.
+        </p>
+        <p class="muted">
+          En términos de clase: PWM es una señal digital “bien administrada” para producir un efecto análogo (brillo, velocidad percibida, etc.).
+        </p>
+
+        <h2 id="cierre">6) Cierre: cómo pensar para no confundirse</h2>
+        <p>
+          Para decidir si tu sensor o actuador se trata como digital o análogo, pregúntate:
+          <strong>¿solo me importa un estado?</strong> (digital) o <strong>¿me importa cuánto?</strong> (análogo).
+          Y recuerda: siempre puedes convertir un análogo a digital con umbrales (“si pasa de X…”).
+        </p>
+
+        <div class="nextprev" aria-label="Navegación siguiente anterior">
+          <a class="btn" href="instalacion.html">← Volver: Instalación</a>
+          <a class="btn btn-primary" href="sensores-y-actuadores.html">Siguiente: Sensores y Actuadores →</a>
+        </div>
+      </article>
+
+      <!-- ASIDE -->
+      <aside class="panel aside" aria-label="Navegación lateral">
+        <div class="mini toc">
+          <h4>En esta página</h4>
+          <a href="#diferencia">1) Diferencia esencial</a>
+          <a href="#grafica">2) Espacio para gráficas</a>
+          <a href="#ejemplos">3) Ejemplos cotidianos</a>
+          <a href="#arduino">4) En Arduino</a>
+          <a href="#pwm">5) PWM</a>
+          <a href="#cierre">6) Cierre</a>
+        </div>
+
+        <div class="mini">
+          <h4>Frase útil</h4>
+          <p>
+            Digital: “¿sí o no?”<br/>
+            Análogo: “¿cuánto?”
+          </p>
+        </div>
+
+        <div class="mini">
+          <h4>Tip docente</h4>
+          <p>
+            Cuando alguien diga “esto es digital porque lo leo con <em>analogRead</em>”, respira:
+            <em>analogRead</em> lee análogo, pero lo entrega como número (discreto). El mundo no se ofende, tú tampoco.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-row">
+        <div>© Dr. Iroel Heredia 2026</div>
+        <div>Universidad Iberoamericana · Curso Arduino (sitio local)</div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
