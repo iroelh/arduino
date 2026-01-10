@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Otros Sensores — Curso Arduino | Universidad Iberoamericana</title>
+  <meta name="description" content="Otros sensores en Arduino: ultrasonido HC-SR04, PIR, DHT11/DHT22, capacitivo e IMU MPU-6050. Ejemplos, calibración y buenas prácticas." />
+  <style>
+    :root{
+      --ibero-red:#C8102E;
+      --bg:#0B0F14;
+      --panel:#111827;
+      --panel2:#0F172A;
+      --text:#EAF0FA;
+      --muted:#A8B3C5;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 14px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --max:1120px;
+      --link:rgba(255,255,255,.92);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(200,16,46,.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(90,160,255,.12), transparent 55%),
+        var(--bg);
+      line-height:1.55;
+    }
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
+    a:focus{outline:2px solid rgba(255,255,255,.35);outline-offset:3px;border-radius:12px}
+
+    .topbar{background:var(--ibero-red);height:10px;width:100%}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(11,15,20,.72);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
+    .header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+    .brand{display:flex;align-items:center;gap:12px;min-width:260px;}
+    .brand-mark{
+      width:40px;height:40px;border-radius:12px;
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.55));
+      box-shadow:0 10px 26px rgba(200,16,46,.25);
+      display:grid;place-items:center;font-weight:800;letter-spacing:.5px;
+    }
+    .brand-title{font-weight:800;font-size:14px;letter-spacing:.2px}
+    .brand-sub{font-size:12px;color:var(--muted)}
+    nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .navlink{
+      padding:10px 12px;border:1px solid var(--border);border-radius:999px;
+      background:rgba(17,24,39,.55);font-size:13px;color:var(--text);
+      transition:transform .12s ease, background .12s ease;white-space:nowrap;
+    }
+    .navlink:hover{transform:translateY(-1px);background:rgba(17,24,39,.85);text-decoration:none}
+
+    main{padding:24px 0 36px}
+
+    .hero{
+      background:linear-gradient(180deg, rgba(17,24,39,.86), rgba(15,23,42,.76));
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+      position:relative;
+      padding:22px;
+    }
+    .hero:before{
+      content:"";position:absolute;inset:0;
+      background:
+        radial-gradient(760px 260px at 10% 0%, rgba(200,16,46,.20), transparent 55%),
+        radial-gradient(560px 280px at 90% 20%, rgba(90,160,255,.18), transparent 55%);
+      pointer-events:none;
+    }
+    .hero > *{position:relative}
+    .breadcrumbs{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:10px}
+    .crumb{color:var(--muted)}
+    .crumb strong{color:rgba(255,255,255,.86);font-weight:700}
+    h1{margin:0 0 10px;font-size:clamp(22px,2.6vw,34px);letter-spacing:-.4px;line-height:1.15}
+    .lead{margin:0;color:var(--muted);font-size:14px;max-width:105ch}
+
+    .layout{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-top:14px;align-items:start}
+    .panel{
+      background:rgba(17,24,39,.70);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .content{padding:18px}
+    .content h2{margin:18px 0 8px;font-size:18px;letter-spacing:-.2px}
+    .content h2:first-child{margin-top:0}
+    .content h3{margin:14px 0 6px;font-size:16px;letter-spacing:-.2px}
+    .content p{margin:0 0 12px;color:rgba(255,255,255,.90)}
+    .content ul{margin:0 0 12px;padding-left:18px;color:rgba(255,255,255,.90)}
+    .content li{margin:6px 0}
+    .content p.muted{color:var(--muted)}
+    code{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:12px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      padding:2px 6px;
+      border-radius:8px;
+      color:rgba(255,255,255,.92);
+    }
+
+    .callout{
+      border:1px solid rgba(200,16,46,.28);
+      background:linear-gradient(180deg, rgba(200,16,46,.14), rgba(200,16,46,.06));
+      border-radius:16px;
+      padding:14px;
+      margin:14px 0;
+      color:rgba(255,255,255,.92);
+    }
+    .warn{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      border-radius:16px;
+      padding:14px;
+      margin:14px 0;
+      color:rgba(255,255,255,.92);
+    }
+
+    .codeblock{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(15,23,42,.60);
+      border-radius:16px;
+      overflow:auto;
+      margin:12px 0 16px;
+    }
+    pre{
+      margin:0;
+      padding:14px;
+      font-size:12.5px;
+      line-height:1.45;
+      color:rgba(255,255,255,.92);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      white-space:pre;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:rgba(15,23,42,.55);
+      margin:12px 0 16px;
+    }
+    table{width:100%;border-collapse:collapse;min-width:860px}
+    th,td{
+      padding:12px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      vertical-align:top;
+      font-size:13px;
+      color:rgba(255,255,255,.90);
+    }
+    th{
+      text-align:left;
+      color:rgba(255,255,255,.82);
+      background:rgba(255,255,255,.04);
+      position:sticky;top:0;
+    }
+    td small{color:var(--muted);display:block;margin-top:4px}
+
+    .aside{padding:14px;display:flex;flex-direction:column;gap:12px}
+    .mini{
+      padding:14px;border-radius:16px;border:1px solid var(--border);
+      background:rgba(11,15,20,.35);
+    }
+    .mini h4{
+      margin:0 0 6px;font-size:13px;letter-spacing:.2px;text-transform:uppercase;
+      color:rgba(255,255,255,.82);
+    }
+    .mini p{margin:0;font-size:13px;color:var(--muted)}
+    .toc a{display:block;padding:9px 10px;border-radius:12px}
+    .toc a:hover{background:rgba(255,255,255,.05);text-decoration:none}
+
+    .nextprev{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:11px 14px;border-radius:14px;border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      font-weight:800;font-size:13px;
+      transition:transform .12s ease, background .12s ease;
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.10);text-decoration:none}
+    .btn-primary{
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.75));
+      border-color:rgba(200,16,46,.35);
+      box-shadow:0 12px 28px rgba(200,16,46,.22);
+    }
+
+    footer{
+      border-top:1px solid var(--border);
+      background:rgba(11,15,20,.72);
+      padding:16px 0;
+    }
+    .footer-row{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      color:var(--muted);font-size:12px;
+    }
+
+    @media (max-width:980px){ .layout{grid-template-columns:1fr} }
+    @media (max-width:620px){
+      .header-row{align-items:flex-start;flex-direction:column}
+      nav{justify-content:flex-start}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar" aria-hidden="true"></div>
+
+  <header>
+    <div class="container">
+      <div class="header-row">
+        <div class="brand" aria-label="Encabezado del curso">
+          <div class="brand-mark" aria-hidden="true">A</div>
+          <div>
+            <div class="brand-title">Arduino — Curso Base</div>
+            <div class="brand-sub">Universidad Iberoamericana</div>
+          </div>
+        </div>
+
+        <nav aria-label="Navegación principal">
+          <a class="navlink" href="index.html">Home</a>
+          <a class="navlink" href="otros-actuadores.html">Otros Actuadores</a>
+          <a class="navlink" href="otros-sensores.html" aria-current="page">Otros Sensores</a>
+          <a class="navlink" href="sensores-y-actuadores.html">Sensores y Actuadores</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" aria-label="Otros sensores">
+      <div class="breadcrumbs">
+        <span class="crumb"><a href="index.html">Home</a></span>
+        <span class="crumb">/</span>
+        <span class="crumb"><strong>Otros Sensores</strong></span>
+      </div>
+
+      <h1>Otros sensores: del “¿hay luz?” al “¿dónde estoy en el espacio?”</h1>
+      <p class="lead">
+        Ya leíste entradas digitales y análogas. Ahora verás sensores típicos de proyectos reales.
+        La idea no es memorizar modelos, sino entender patrones: <strong>qué miden</strong>, <strong>qué necesitan</strong>
+        (tiempos, librerías, voltaje) y cómo traducir sus datos a decisiones.
+      </p>
+    </section>
+
+    <section class="layout" aria-label="Contenido principal y navegación">
+      <article class="panel content">
+
+        <h2 id="patrones">1) Patrones (para no volverte coleccionista de módulos)</h2>
+        <p>Muchos sensores caen en una de estas familias:</p>
+        <ul>
+          <li><strong>Digital simple:</strong> HIGH/LOW (PIR, switch, algunos sensores de flama).</li>
+          <li><strong>Digital por protocolo:</strong> I2C / SPI / OneWire (IMU, pantallas, memorias).</li>
+          <li><strong>Por tiempo:</strong> miden pulsos (ultrasonido HC-SR04).</li>
+          <li><strong>Análogo:</strong> voltaje variable (potenciómetro, LDR, algunos sensores de gas).</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Idea conservadora que salva proyectos:</strong>
+          antes de “integrar”, haz un sketch mínimo que solo lea el sensor y lo imprima por Serial.
+          Primero entender, luego combinar.
+        </div>
+
+        <h2 id="ultra">2) Ultrasonido HC-SR04: distancia por tiempo</h2>
+        <p>
+          El HC-SR04 manda un “clic” ultrasónico y mide cuánto tarda en rebotar.
+          Arduino mide el tiempo del pulso de regreso y lo convierte a distancia.
+        </p>
+
+        <div class="table-wrap" aria-label="Cableado HC-SR04">
+          <table>
+            <thead>
+              <tr><th>Pin módulo</th><th>Conectar a</th><th>Nota</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>VCC</strong></td><td>5V</td><td><small>En UNO es directo. En placas 3.3V revisar compatibilidad.</small></td></tr>
+              <tr><td><strong>GND</strong></td><td>GND</td><td><small>Siempre GND común.</small></td></tr>
+              <tr><td><strong>TRIG</strong></td><td>D9 (ejemplo)</td><td><small>Salida: manda pulso.</small></td></tr>
+              <tr><td><strong>ECHO</strong></td><td>D10 (ejemplo)</td><td><small>Entrada: recibe pulso.</small></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="codeblock" role="region" aria-label="Ejemplo HC-SR04 distancia">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Sensor: Ultrasonido HC-SR04 (distancia)
+// Autoría académica: Dr. Iroel Heredia (2026)
+// ------------------------------------------------------------
+
+const int trigPin = 9;
+const int echoPin = 10;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  // 1) Asegurar trig en LOW un momento
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  // 2) Pulso de 10 microsegundos para disparar
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // 3) Medir duración del pulso ECHO (en microsegundos)
+  long duracion = pulseIn(echoPin, HIGH, 30000); // timeout 30 ms (~5 m)
+
+  // 4) Convertir a cm.
+  // Velocidad del sonido ~343 m/s => 0.0343 cm/us
+  // La señal va y regresa, por eso /2
+  float distanciaCm = (duracion * 0.0343) / 2.0;
+
+  Serial.print("Duracion(us): ");
+  Serial.print(duracion);
+  Serial.print("  Distancia(cm): ");
+  Serial.println(distanciaCm);
+
+  delay(100);
+}</code></pre>
+        </div>
+
+        <div class="warn">
+          <strong>Notas reales:</strong> superficies blandas (tela), ángulos raros o espacios abiertos pueden dar lecturas inestables.
+          Esto no es “falla del Arduino”, es física con carácter.
+        </div>
+
+        <h2 id="pir">3) PIR: detección de movimiento (digital)</h2>
+        <p>
+          El PIR detecta cambios de radiación infrarroja (cuerpos calientes moviéndose).
+          Normalmente entrega una salida digital: HIGH cuando detecta movimiento.
+        </p>
+
+        <div class="codeblock" role="region" aria-label="Ejemplo PIR enciende LED">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Sensor: PIR (movimiento) -> LED
+// Autoría académica: Dr. Iroel Heredia (2026)
+// ------------------------------------------------------------
+
+const int pirPin = 2;
+const int ledPin = LED_BUILTIN;
+
+void setup() {
+  pinMode(pirPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+  Serial.begin(9600);
+
+  // Algunos PIR necesitan "calentamiento" 30-60s al iniciar
+  Serial.println("PIR iniciando... espera un momento.");
+  delay(2000);
+}
+
+void loop() {
+  int m = digitalRead(pirPin);
+
+  if (m == HIGH) {
+    digitalWrite(ledPin, HIGH);
+    Serial.println("Movimiento detectado");
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
+
+  delay(50);
+}</code></pre>
+        </div>
+
+        <h2 id="dht">4) DHT11 / DHT22: temperatura y humedad (con librería)</h2>
+        <p>
+          Estos sensores entregan datos por un protocolo digital. En clase, lo práctico es usar librería.
+          DHT11 es más económico y menos preciso; DHT22 suele ser más preciso.
+        </p>
+
+        <div class="warn">
+          <strong>Nota:</strong> Para compilar este ejemplo necesitas instalar una librería de DHT (por el Library Manager).
+          Si algo falla, empieza por lo tradicional: cableado + tipo de sensor correcto + pin correcto.
+        </div>
+
+        <div class="codeblock" role="region" aria-label="Ejemplo DHT temperatura y humedad">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Sensor: DHT11/DHT22 (temperatura y humedad)
+// Autoría académica: Dr. Iroel Heredia (2026)
+//
+// Requiere librería "DHT sensor library" (Adafruit) y "Adafruit Unified Sensor"
+// ------------------------------------------------------------
+
+#include &lt;DHT.h&gt;
+
+#define DHTPIN  2     // pin de datos
+#define DHTTYPE DHT11 // cambia a DHT22 si usas ese modelo
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+}
+
+void loop() {
+  float h = dht.readHumidity();
+  float t = dht.readTemperature(); // °C por defecto
+
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Error leyendo DHT");
+    delay(1000);
+    return;
+  }
+
+  Serial.print("Humedad: ");
+  Serial.print(h);
+  Serial.print("%  Temp: ");
+  Serial.print(t);
+  Serial.println(" C");
+
+  delay(1500);
+}</code></pre>
+        </div>
+
+        <h2 id="capacitivo">5) Sensor capacitivo “touch”: tocar sin botón</h2>
+        <p>
+          Un sensor capacitivo detecta cambios de capacitancia cuando acercas el dedo.
+          Muchos módulos entregan una salida digital (HIGH/LOW) como si fuera botón.
+        </p>
+
+        <div class="codeblock" role="region" aria-label="Ejemplo touch como botón">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Sensor: Touch capacitivo (salida digital) -> cambia estado de LED
+// Autoría académica: Dr. Iroel Heredia (2026)
+//
+// Nota: este ejemplo es como "evento de toque" (con debounce simple)
+// ------------------------------------------------------------
+
+const int touchPin = 2;       // salida digital del módulo
+const int ledPin   = 13;
+
+bool encendido = false;
+int  ultimo = LOW;
+unsigned long t0 = 0;
+const unsigned long debounceMs = 40;
+
+void setup() {
+  pinMode(touchPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  int v = digitalRead(touchPin);
+
+  if (v != ultimo) { t0 = millis(); ultimo = v; }
+
+  if ((millis() - t0) > debounceMs) {
+    static bool listo = true;
+
+    if (v == HIGH && listo) {
+      encendido = !encendido;
+      digitalWrite(ledPin, encendido ? HIGH : LOW);
+      listo = false;
+    }
+    if (v == LOW) listo = true;
+  }
+}</code></pre>
+        </div>
+
+        <h2 id="imu">6) IMU (MPU-6050): acelerómetro + giroscopio (I2C)</h2>
+        <p>
+          Una IMU mide aceleración (incluida gravedad) y velocidad angular.
+          Se comunica por <strong>I2C</strong>, que usa dos líneas:
+          <code>SDA</code> y <code>SCL</code>.
+        </p>
+
+        <div class="table-wrap" aria-label="I2C en Arduino UNO">
+          <table>
+            <thead><tr><th>Señal</th><th>UNO</th><th>Nota</th></tr></thead>
+            <tbody>
+              <tr><td><strong>SDA</strong></td><td>A4</td><td><small>Línea de datos I2C</small></td></tr>
+              <tr><td><strong>SCL</strong></td><td>A5</td><td><small>Línea de reloj I2C</small></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="warn">
+          <strong>Realidad práctica:</strong> En I2C, el cableado y el ruido importan. Cables largos = lecturas raras.
+          Mantén conexiones cortas para empezar.
+        </div>
+
+        <div class="codeblock" role="region" aria-label="MPU-6050 lectura básica (Wire)">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Sensor: MPU-6050 (I2C) lectura básica (registro WHO_AM_I)
+// Autoría académica: Dr. Iroel Heredia (2026)
+//
+// Este ejemplo verifica que el dispositivo responde en I2C.
+// Para lecturas completas (acel/gyro) normalmente se usa librería.
+// ------------------------------------------------------------
+
+#include &lt;Wire.h&gt;
+
+const byte MPU_ADDR = 0x68;   // dirección común del MPU-6050
+const byte WHO_AM_I = 0x75;   // registro de identificación
+
+void setup() {
+  Serial.begin(9600);
+  Wire.begin();
+
+  // "Despertar" el MPU-6050 (sale de sleep)
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x6B); // PWR_MGMT_1
+  Wire.write(0);    // set to 0 wakes up
+  Wire.endTransmission(true);
+
+  Serial.println("MPU-6050: iniciando...");
+}
+
+void loop() {
+  // Leer WHO_AM_I
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(WHO_AM_I);
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU_ADDR, (byte)1, (byte)true);
+
+  if (Wire.available()) {
+    byte id = Wire.read();
+    Serial.print("WHO_AM_I = 0x");
+    Serial.println(id, HEX);
+  } else {
+    Serial.println("No respuesta I2C (revisa SDA/SCL, GND, VCC)");
+  }
+
+  delay(1000);
+}</code></pre>
+        </div>
+
+        <h2 id="buenas">7) Buenas prácticas (que parecen aburridas hasta que salvan el día)</h2>
+        <ul>
+          <li><strong>Serial primero:</strong> imprime valores antes de “hacer magia” con LEDs/motores.</li>
+          <li><strong>Calibración:</strong> umbrales dependen del ambiente (luz, temperatura, distancia).</li>
+          <li><strong>Tiempo:</strong> algunos sensores requieren esperar (PIR) o intervalos (DHT).</li>
+          <li><strong>Voltajes:</strong> revisa si el módulo es 5V o 3.3V (sobre todo con sensores modernos).</li>
+          <li><strong>GND común:</strong> si compartes señal, comparte tierra.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Ejercicio integrador:</strong> Con un HC-SR04, prende un buzzer si alguien está a menos de 30 cm,
+          y enciende un LED si está entre 30–80 cm. Usa <code>if / else if</code>.
+        </div>
+
+        <div class="nextprev" aria-label="Navegación siguiente anterior">
+          <a class="btn" href="otros-actuadores.html">← Volver: Otros Actuadores</a>
+          <a class="btn btn-primary" href="index.html">Volver a Home →</a>
+        </div>
+      </article>
+
+      <aside class="panel aside" aria-label="Navegación lateral">
+        <div class="mini toc">
+          <h4>En esta página</h4>
+          <a href="#patrones">1) Patrones</a>
+          <a href="#ultra">2) Ultrasonido</a>
+          <a href="#pir">3) PIR</a>
+          <a href="#dht">4) DHT</a>
+          <a href="#capacitivo">5) Capacitivo</a>
+          <a href="#imu">6) IMU</a>
+          <a href="#buenas">7) Buenas prácticas</a>
+        </div>
+
+        <div class="mini">
+          <h4>Tip de profe</h4>
+          <p>
+            Si un sensor “no funciona”, no lo insultes: mide.
+            Un multímetro y Serial Monitor son el dúo tradicional que nunca pasa de moda.
+          </p>
+        </div>
+
+        <div class="mini">
+          <h4>Recordatorio</h4>
+          <p>
+            Cada módulo es un “ecosistema”: voltaje, tiempos, librería, y cableado.
+            Quien domina eso, domina el taller.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-row">
+        <div>© Dr. Iroel Heredia 2026</div>
+        <div>Universidad Iberoamericana · Curso Arduino (sitio local)</div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Otros Actuadores — Curso Arduino | Universidad Iberoamericana</title>
+  <meta name="description" content="Otros actuadores en Arduino: servo, motor DC, relevador y buzzer. Drivers, MOSFET y seguridad eléctrica. Ejemplos y retos." />
+  <style>
+    :root{
+      --ibero-red:#C8102E;
+      --bg:#0B0F14;
+      --panel:#111827;
+      --panel2:#0F172A;
+      --text:#EAF0FA;
+      --muted:#A8B3C5;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 14px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --max:1120px;
+      --link:rgba(255,255,255,.92);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(200,16,46,.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(90,160,255,.12), transparent 55%),
+        var(--bg);
+      line-height:1.55;
+    }
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:3px}
+    a:focus{outline:2px solid rgba(255,255,255,.35);outline-offset:3px;border-radius:12px}
+
+    .topbar{background:var(--ibero-red);height:10px;width:100%}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(11,15,20,.72);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
+    .header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+    .brand{display:flex;align-items:center;gap:12px;min-width:260px;}
+    .brand-mark{
+      width:40px;height:40px;border-radius:12px;
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.55));
+      box-shadow:0 10px 26px rgba(200,16,46,.25);
+      display:grid;place-items:center;font-weight:800;letter-spacing:.5px;
+    }
+    .brand-title{font-weight:800;font-size:14px;letter-spacing:.2px}
+    .brand-sub{font-size:12px;color:var(--muted)}
+    nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .navlink{
+      padding:10px 12px;border:1px solid var(--border);border-radius:999px;
+      background:rgba(17,24,39,.55);font-size:13px;color:var(--text);
+      transition:transform .12s ease, background .12s ease;white-space:nowrap;
+    }
+    .navlink:hover{transform:translateY(-1px);background:rgba(17,24,39,.85);text-decoration:none}
+
+    main{padding:24px 0 36px}
+
+    .hero{
+      background:linear-gradient(180deg, rgba(17,24,39,.86), rgba(15,23,42,.76));
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+      position:relative;
+      padding:22px;
+    }
+    .hero:before{
+      content:"";position:absolute;inset:0;
+      background:
+        radial-gradient(760px 260px at 10% 0%, rgba(200,16,46,.20), transparent 55%),
+        radial-gradient(560px 280px at 90% 20%, rgba(90,160,255,.18), transparent 55%);
+      pointer-events:none;
+    }
+    .hero > *{position:relative}
+    .breadcrumbs{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:10px}
+    .crumb{color:var(--muted)}
+    .crumb strong{color:rgba(255,255,255,.86);font-weight:700}
+    h1{margin:0 0 10px;font-size:clamp(22px,2.6vw,34px);letter-spacing:-.4px;line-height:1.15}
+    .lead{margin:0;color:var(--muted);font-size:14px;max-width:105ch}
+
+    .layout{display:grid;grid-template-columns:1fr 320px;gap:14px;margin-top:14px;align-items:start}
+    .panel{
+      background:rgba(17,24,39,.70);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .content{padding:18px}
+    .content h2{margin:18px 0 8px;font-size:18px;letter-spacing:-.2px}
+    .content h2:first-child{margin-top:0}
+    .content h3{margin:14px 0 6px;font-size:16px;letter-spacing:-.2px}
+    .content p{margin:0 0 12px;color:rgba(255,255,255,.90)}
+    .content ul{margin:0 0 12px;padding-left:18px;color:rgba(255,255,255,.90)}
+    .content li{margin:6px 0}
+    .content p.muted{color:var(--muted)}
+    code{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:12px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      padding:2px 6px;
+      border-radius:8px;
+      color:rgba(255,255,255,.92);
+    }
+
+    .callout{
+      border:1px solid rgba(200,16,46,.28);
+      background:linear-gradient(180deg, rgba(200,16,46,.14), rgba(200,16,46,.06));
+      border-radius:16px;
+      padding:14px;
+      margin:14px 0;
+      color:rgba(255,255,255,.92);
+    }
+    .danger{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      border-radius:16px;
+      padding:14px;
+      margin:14px 0;
+      color:rgba(255,255,255,.92);
+    }
+
+    .codeblock{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(15,23,42,.60);
+      border-radius:16px;
+      overflow:auto;
+      margin:12px 0 16px;
+    }
+    pre{
+      margin:0;
+      padding:14px;
+      font-size:12.5px;
+      line-height:1.45;
+      color:rgba(255,255,255,.92);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      white-space:pre;
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:12px;
+      margin:12px 0 16px;
+    }
+    .card{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(15,23,42,.55);
+      border-radius:16px;
+      padding:14px;
+    }
+    .card h4{margin:0 0 8px;font-size:14px;letter-spacing:-.1px}
+    .card p{margin:0;color:var(--muted);font-size:13px}
+
+    .aside{padding:14px;display:flex;flex-direction:column;gap:12px}
+    .mini{
+      padding:14px;border-radius:16px;border:1px solid var(--border);
+      background:rgba(11,15,20,.35);
+    }
+    .mini h4{
+      margin:0 0 6px;font-size:13px;letter-spacing:.2px;text-transform:uppercase;
+      color:rgba(255,255,255,.82);
+    }
+    .mini p{margin:0;font-size:13px;color:var(--muted)}
+    .toc a{display:block;padding:9px 10px;border-radius:12px}
+    .toc a:hover{background:rgba(255,255,255,.05);text-decoration:none}
+
+    .nextprev{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:11px 14px;border-radius:14px;border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      font-weight:800;font-size:13px;
+      transition:transform .12s ease, background .12s ease;
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.10);text-decoration:none}
+    .btn-primary{
+      background:linear-gradient(135deg, rgba(200,16,46,1), rgba(200,16,46,.75));
+      border-color:rgba(200,16,46,.35);
+      box-shadow:0 12px 28px rgba(200,16,46,.22);
+    }
+
+    footer{
+      border-top:1px solid var(--border);
+      background:rgba(11,15,20,.72);
+      padding:16px 0;
+    }
+    .footer-row{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      color:var(--muted);font-size:12px;
+    }
+
+    @media (max-width:980px){
+      .layout{grid-template-columns:1fr}
+      .cards{grid-template-columns:1fr}
+    }
+    @media (max-width:620px){
+      .header-row{align-items:flex-start;flex-direction:column}
+      nav{justify-content:flex-start}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar" aria-hidden="true"></div>
+
+  <header>
+    <div class="container">
+      <div class="header-row">
+        <div class="brand" aria-label="Encabezado del curso">
+          <div class="brand-mark" aria-hidden="true">A</div>
+          <div>
+            <div class="brand-title">Arduino — Curso Base</div>
+            <div class="brand-sub">Universidad Iberoamericana</div>
+          </div>
+        </div>
+
+        <nav aria-label="Navegación principal">
+          <a class="navlink" href="index.html">Home</a>
+          <a class="navlink" href="ifs.html">Ifs</a>
+          <a class="navlink" href="otros-actuadores.html" aria-current="page">Otros Actuadores</a>
+          <a class="navlink" href="otros-sensores.html">Otros Sensores</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero" aria-label="Otros actuadores">
+      <div class="breadcrumbs">
+        <span class="crumb"><a href="index.html">Home</a></span>
+        <span class="crumb">/</span>
+        <span class="crumb"><strong>Otros Actuadores</strong></span>
+      </div>
+
+      <h1>Otros actuadores: cuando el “músculo” ya no cabe en un pin</h1>
+      <p class="lead">
+        LEDs fueron el calentamiento. Aquí entran actuadores que requieren más “fuerza” o control:
+        <strong>servo</strong> (posición), <strong>motor DC</strong> (velocidad), <strong>relevador</strong> (conmutar cargas),
+        y <strong>buzzer</strong> (sonido). También veremos por qué el Arduino no debe “hacer de cargador universal”.
+      </p>
+    </section>
+
+    <section class="layout" aria-label="Contenido principal y navegación">
+      <article class="panel content">
+
+        <h2 id="principio">1) Principio general: Arduino decide, el driver ejecuta</h2>
+        <p>
+          Un pin digital es excelente para señal, pero malo para potencia.
+          Muchos actuadores piden más corriente de la que un pin puede entregar de forma segura.
+          Por eso existe el “músculo externo”: <strong>transistores</strong>, <strong>MOSFETs</strong>, <strong>drivers</strong>, <strong>relés</strong>.
+        </p>
+
+        <div class="danger">
+          <strong>Advertencia sana:</strong> no alimentes motores/bombas/relés grandes desde el pin de Arduino.
+          Si lo haces, a veces funciona… justo hasta que deja de funcionar. Y el humo sale sin pedir permiso.
+        </div>
+
+        <div class="cards" aria-label="Cuándo necesitas electrónica extra">
+          <div class="card">
+            <h4>Necesitas driver / MOSFET cuando…</h4>
+            <p>La carga consume “mucho” (motores, tiras LED largas, bombas) o es inductiva.</p>
+          </div>
+          <div class="card">
+            <h4>Necesitas relevador cuando…</h4>
+            <p>Quieres conmutar algo de mayor voltaje/corriente (AC o DC) sin mezclar potencias en el Arduino.</p>
+          </div>
+        </div>
+
+        <h2 id="servo">2) Servo: controlar posición (0–180°)</h2>
+        <p>
+          Un servo típico (SG90, MG90S, etc.) se controla por una señal tipo PWM especial (pulsos).
+          Lo más fácil es usar la librería <code>Servo.h</code>.
+        </p>
+        <ul>
+          <li>Servo tiene 3 cables: <strong>GND</strong>, <strong>Vcc (5V)</strong>, <strong>señal</strong>.</li>
+          <li>La señal puede ir a un pin digital (ej. D9).</li>
+          <li>Si el servo se pone “nervioso” o reinicia Arduino, aliméntalo con fuente externa y GND común.</li>
+        </ul>
+
+        <div class="codeblock" role="region" aria-label="Ejemplo servo básico">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Tema: Actuador Servo — posición con potenciómetro
+// Autoría académica: Dr. Iroel Heredia (2026)
+//
+// Cableado:
+//   - Potenciómetro: centro a A0, extremos a 5V y GND
+//   - Servo: señal a D9, Vcc a 5V (o fuente externa), GND a GND
+// ------------------------------------------------------------
+
+#include &lt;Servo.h&gt;
+
+Servo miServo;
+
+const int potPin   = A0;
+const int servoPin = 9;
+
+void setup() {
+  miServo.attach(servoPin);
+}
+
+void loop() {
+  int v = analogRead(potPin);              // 0..1023
+  int angulo = map(v, 0, 1023, 0, 180);    // 0..180 grados
+
+  miServo.write(angulo);
+  delay(15); // pequeñísima pausa para estabilidad
+}</code></pre>
+        </div>
+
+        <h2 id="motor-dc">3) Motor DC: velocidad por PWM (con MOSFET o driver)</h2>
+        <p>
+          Un motor DC no se conecta directo al pin. Normalmente lo controlas con:
+        </p>
+        <ul>
+          <li>Un <strong>MOSFET</strong> (control eficiente de velocidad por PWM) + diodo flyback.</li>
+          <li>O un <strong>driver puente H</strong> (si quieres invertir giro: L298N, TB6612FNG, etc.).</li>
+        </ul>
+        <p class="muted">
+          Aquí mostramos el control conceptual de velocidad (la parte de Arduino). El hardware de potencia es obligatorio.
+        </p>
+
+        <div class="codeblock" role="region" aria-label="Motor DC velocidad con PWM (conceptual)">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Tema: Motor DC — velocidad con PWM (requiere MOSFET/driver)
+// Autoría académica: Dr. Iroel Heredia (2026)
+//
+// NOTA: No conectes el motor directo al pin.
+// Usa MOSFET + diodo flyback + fuente externa + GND común.
+// ------------------------------------------------------------
+
+const int potPin = A0;
+const int motorPWM = 9; // pin PWM hacia el gate/entrada del driver
+
+void setup() {
+  pinMode(motorPWM, OUTPUT);
+}
+
+void loop() {
+  int v = analogRead(potPin);              // 0..1023
+  int pwm = map(v, 0, 1023, 0, 255);       // 0..255
+  analogWrite(motorPWM, pwm);              // “más PWM” => más velocidad (típicamente)
+  delay(10);
+}</code></pre>
+        </div>
+
+        <div class="callout">
+          <strong>Truco didáctico:</strong> PWM es como “dar empujoncitos” muy rápido.
+          El motor promedia esos empujes y parece una velocidad continua.
+        </div>
+
+        <h2 id="rele">4) Relevador: encender/apagar cargas mayores (con cuidado)</h2>
+        <p>
+          Un relevador (relay) es un interruptor controlado eléctricamente.
+          Te sirve para prender/apagar algo de mayor potencia (una lámpara, un ventilador, etc.).
+          Lo correcto es usar un <strong>módulo de relevador</strong> (ya trae transistor y diodo).
+        </p>
+
+        <div class="danger">
+          <strong>Seguridad:</strong> si vas a conmutar AC (corriente de pared), eso ya no es “tarea de salón sin supervisión”.
+          Trabaja con personal capacitado y medidas de seguridad. Arduino no es un casco.
+        </div>
+
+        <div class="codeblock" role="region" aria-label="Relevador con digitalWrite">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Tema: Relevador — encendido/apagado con digitalWrite
+// Autoría académica: Dr. Iroel Heredia (2026)
+//
+// Usar módulo de relevador:
+//   IN  -> pin digital (ej. 7)
+//   VCC -> 5V
+//   GND -> GND
+//
+// Nota: algunos módulos son "activo en LOW".
+// Si al revés, invierte HIGH/LOW.
+// ------------------------------------------------------------
+
+const int rele = 7;
+
+void setup() {
+  pinMode(rele, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(rele, HIGH); // encender
+  delay(1000);
+  digitalWrite(rele, LOW);  // apagar
+  delay(1000);
+}</code></pre>
+        </div>
+
+        <h2 id="buzzer">5) Buzzer: sonido (simple y rápido)</h2>
+        <p>
+          Un buzzer puede ser:
+        </p>
+        <ul>
+          <li><strong>Activo:</strong> suena con solo encenderlo (es más “plug &amp; play”).</li>
+          <li><strong>Pasivo:</strong> necesita una frecuencia (para notas). Arduino tiene <code>tone()</code>.</li>
+        </ul>
+
+        <div class="codeblock" role="region" aria-label="Buzzer con tone">
+<pre><code>// ------------------------------------------------------------
+// Curso Arduino — Universidad Iberoamericana (IBERO)
+// Tema: Buzzer pasivo — tone()
+// Autoría académica: Dr. Iroel Heredia (2026)
+//
+// Cableado (simple):
+//   buzzer -> pin 8 y GND (según módulo, puede requerir resistencia/transistor)
+// ------------------------------------------------------------
+
+const int buzzer = 8;
+
+void setup() {
+  // nada especial
+}
+
+void loop() {
+  tone(buzzer, 440);   // La 440 Hz
+  delay(300);
+  noTone(buzzer);
+  delay(300);
+
+  tone(buzzer, 660);   // Mi 660 Hz
+  delay(300);
+  noTone(buzzer);
+  delay(600);
+}</code></pre>
+        </div>
+
+        <h2 id="retos">6) Retos (para práctica)</h2>
+        <ul>
+          <li><strong>Reto Servo:</strong> mueve el servo a 0°, 90°, 180° con tres botones.</li>
+          <li><strong>Reto Motor DC:</strong> potenciómetro controla velocidad, y un botón hace “stop” inmediato.</li>
+          <li><strong>Reto Relevador:</strong> con un LDR, prende una lámpara cuando oscurezca (umbral + histéresis).</li>
+          <li><strong>Reto Buzzer:</strong> crea un “código morse” básico: punto = 200ms, raya = 600ms.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Cierre:</strong> Los actuadores “serios” te obligan a pensar en energía.
+          Es un excelente hábito: quien diseña interacción también diseña responsabilidades.
+        </div>
+
+        <div class="nextprev" aria-label="Navegación siguiente anterior">
+          <a class="btn" href="ifs.html">← Volver: Ifs</a>
+          <a class="btn btn-primary" href="otros-sensores.html">Siguiente: Otros Sensores →</a>
+        </div>
+      </article>
+
+      <aside class="panel aside" aria-label="Navegación lateral">
+        <div class="mini toc">
+          <h4>En esta página</h4>
+          <a href="#principio">1) Arduino decide / driver ejecuta</a>
+          <a href="#servo">2) Servo</a>
+          <a href="#motor-dc">3) Motor DC</a>
+          <a href="#rele">4) Relevador</a>
+          <a href="#buzzer">5) Buzzer</a>
+          <a href="#retos">6) Retos</a>
+        </div>
+
+        <div class="mini">
+          <h4>Regla conservadora</h4>
+          <p>
+            Si un actuador “jala fuerte”, se trata con respeto:
+            fuente externa, diodo, y GND común. Tradición eléctrica: no pelearse con Ohm.
+          </p>
+        </div>
+
+        <div class="mini">
+          <h4>Tip rápido</h4>
+          <p>
+            Si algo se resetea “misteriosamente”, casi siempre es alimentación.
+            El misterio es solo un multímetro que aún no conoces.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-row">
+        <div>© Dr. Iroel Heredia 2026</div>
+        <div>Universidad Iberoamericana · Curso Arduino (sitio local)</div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
