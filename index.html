@@ -449,24 +449,8 @@
 
       <div class="grid" role="list">
 
-        <!-- NOTA: Cambia el src de cada imagen por tus imágenes reales
-             (por ejemplo: images/intro.jpg). Aquí uso SVG inline para que funcione “sin assets”. -->
-
         <a class="card" href="introduccion.html" role="listitem" aria-label="Ir a Introducción">
-          <img class="thumb" alt="Portada de Introducción"
-               src="data:image/svg+xml;utf8,
-               <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'>
-                 <defs>
-                   <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-                     <stop offset='0' stop-color='%23C8102E' stop-opacity='.35'/>
-                     <stop offset='1' stop-color='%235AA0FF' stop-opacity='.25'/>
-                   </linearGradient>
-                 </defs>
-                 <rect width='1200' height='675' fill='%23111827'/>
-                 <rect width='1200' height='675' fill='url(%23g)'/>
-                 <text x='60' y='120' fill='white' font-family='Arial' font-size='54' font-weight='700'>Introducción</text>
-                 <text x='60' y='190' fill='%23A8B3C5' font-family='Arial' font-size='28'>Qué es Arduino y cómo trabajaremos</text>
-               </svg>">
+          <img class="thumb" alt="Portada de Introducción" src="introduccion.png">
           <div class="card-body">
             <h3 class="card-title">Introducción</h3>
             <p class="card-desc">Qué es Arduino, objetivos del curso y metodología de trabajo.</p>
@@ -478,15 +462,7 @@
         </a>
 
         <a class="card" href="instalacion.html" role="listitem" aria-label="Ir a Instalación">
-          <img class="thumb" alt="Portada de Instalación"
-               src="data:image/svg+xml;utf8,
-               <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'>
-                 <rect width='1200' height='675' fill='%230F172A'/>
-                 <circle cx='980' cy='120' r='210' fill='%23C8102E' fill-opacity='.20'/>
-                 <circle cx='240' cy='560' r='260' fill='%235AA0FF' fill-opacity='.14'/>
-                 <text x='60' y='120' fill='white' font-family='Arial' font-size='54' font-weight='700'>Instalación</text>
-                 <text x='60' y='190' fill='%23A8B3C5' font-family='Arial' font-size='28'>IDE, drivers y primer sketch</text>
-               </svg>">
+          <img class="thumb" alt="Portada de Instalación" src="instalacion.png">
           <div class="card-body">
             <h3 class="card-title">Instalación</h3>
             <p class="card-desc">Arduino IDE, drivers, placa/puerto y primer “Hola Mundo”.</p>
@@ -498,16 +474,7 @@
         </a>
 
         <a class="card" href="digital-vs-analogico.html" role="listitem" aria-label="Ir a Digital vs Análogo">
-          <img class="thumb" alt="Portada de Digital vs Análogo"
-               src="data:image/svg+xml;utf8,
-               <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'>
-                 <rect width='1200' height='675' fill='%23111827'/>
-                 <rect x='0' y='0' width='1200' height='675' fill='%23C8102E' fill-opacity='.10'/>
-                 <path d='M0 470 C200 430 260 540 420 500 C600 450 640 560 820 510 C980 470 1040 560 1200 530'
-                       fill='none' stroke='%235AA0FF' stroke-opacity='.55' stroke-width='10'/>
-                 <text x='60' y='120' fill='white' font-family='Arial' font-size='54' font-weight='700'>Digital vs Análogo</text>
-                 <text x='60' y='190' fill='%23A8B3C5' font-family='Arial' font-size='28'>Señales, bits, voltaje y PWM</text>
-               </svg>">
+          <img class="thumb" alt="Portada de Digital vs Análogo" src="digitalvsanalogo.png">
           <div class="card-body">
             <h3 class="card-title">Digital vs Análogo</h3>
             <p class="card-desc">Conceptos clave para entender entradas/salidas y PWM.</p>
@@ -519,15 +486,7 @@
         </a>
 
         <a class="card" href="sensores-y-actuadores.html" role="listitem" aria-label="Ir a Sensores y Actuadores">
-          <img class="thumb" alt="Portada de Sensores y Actuadores"
-               src="data:image/svg+xml;utf8,
-               <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'>
-                 <rect width='1200' height='675' fill='%230F172A'/>
-                 <rect x='60' y='80' width='380' height='240' rx='26' fill='%23C8102E' fill-opacity='.18'/>
-                 <rect x='760' y='330' width='380' height='240' rx='26' fill='%235AA0FF' fill-opacity='.14'/>
-                 <text x='60' y='120' fill='white' font-family='Arial' font-size='54' font-weight='700'>Sensores y Actuadores</text>
-                 <text x='60' y='190' fill='%23A8B3C5' font-family='Arial' font-size='28'>Entradas, salidas y conexión básica</text>
-               </svg>">
+          <img class="thumb" alt="Portada de Sensores y Actuadores" src="sensoresvsactuadores.png">
           <div class="card-body">
             <h3 class="card-title">Sensores y Actuadores</h3>
             <p class="card-desc">Qué mide un sensor, qué hace un actuador y cómo se integran.</p>
@@ -539,14 +498,7 @@
         </a>
 
         <a class="card" href="digitalwrite.html" role="listitem" aria-label="Ir a Programación por Código digitalWrite">
-          <img class="thumb" alt="Portada de digitalWrite"
-               src="data:image/svg+xml;utf8,
-               <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'>
-                 <rect width='1200' height='675' fill='%23111827'/>
-                 <circle cx='220' cy='240' r='180' fill='%23C8102E' fill-opacity='.18'/>
-                 <text x='60' y='120' fill='white' font-family='Arial' font-size='54' font-weight='700'>digitalWrite</text>
-                 <text x='60' y='190' fill='%23A8B3C5' font-family='Arial' font-size='28'>Control básico de salidas</text>
-               </svg>">
+          <img class="thumb" alt="Portada de digitalWrite" src="digitalWrite.png">
           <div class="card-body">
             <h3 class="card-title">Programación por Código (digitalWrite)</h3>
             <p class="card-desc">PinMode, HIGH/LOW y control de LEDs/relevadores.</p>
@@ -558,14 +510,7 @@
         </a>
 
         <a class="card" href="digitalread.html" role="listitem" aria-label="Ir a digitalRead">
-          <img class="thumb" alt="Portada de digitalRead"
-               src="data:image/svg+xml;utf8,
-               <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'>
-                 <rect width='1200' height='675' fill='%230F172A'/>
-                 <circle cx='980' cy='520' r='240' fill='%235AA0FF' fill-opacity='.14'/>
-                 <text x='60' y='120' fill='white' font-family='Arial' font-size='54' font-weight='700'>digitalRead</text>
-                 <text x='60' y='190' fill='%23A8B3C5' font-family='Arial' font-size='28'>Condicionantes digitales</text>
-               </svg>">
+          <img class="thumb" alt="Portada de digitalRead" src="digitalRead.png">
           <div class="card-body">
             <h3 class="card-title">Condicionante Digital (digitalRead)</h3>
             <p class="card-desc">Botones, pull-up y decisiones por entrada digital.</p>
@@ -577,14 +522,7 @@
         </a>
 
         <a class="card" href="analogread.html" role="listitem" aria-label="Ir a analogRead">
-          <img class="thumb" alt="Portada de analogRead"
-               src="data:image/svg+xml;utf8,
-               <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'>
-                 <rect width='1200' height='675' fill='%23111827'/>
-                 <rect x='0' y='0' width='1200' height='675' fill='%235AA0FF' fill-opacity='.10'/>
-                 <text x='60' y='120' fill='white' font-family='Arial' font-size='54' font-weight='700'>analogRead</text>
-                 <text x='60' y='190' fill='%23A8B3C5' font-family='Arial' font-size='28'>Lectura análoga y mapeo</text>
-               </svg>">
+          <img class="thumb" alt="Portada de analogRead" src="analogRead.png">
           <div class="card-body">
             <h3 class="card-title">Condicionante Análogo (analogRead)</h3>
             <p class="card-desc">Lectura de sensores analógicos y conversión a rangos útiles.</p>
@@ -595,17 +533,9 @@
           </div>
         </a>
 
-        <a class="card" href="if-multiples.html" role="listitem" aria-label="Ir a Condicionantes múltiples">
-          <img class="thumb" alt="Portada de If múltiples"
-               src="data:image/svg+xml;utf8,
-               <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'>
-                 <rect width='1200' height='675' fill='%230F172A'/>
-                 <rect x='80' y='110' width='1040' height='90' rx='20' fill='%23C8102E' fill-opacity='.16'/>
-                 <rect x='80' y='240' width='740' height='90' rx='20' fill='%235AA0FF' fill-opacity='.12'/>
-                 <rect x='80' y='370' width='900' height='90' rx='20' fill='%23C8102E' fill-opacity='.12'/>
-                 <text x='60' y='120' fill='white' font-family='Arial' font-size='54' font-weight='700'>If múltiples</text>
-                 <text x='60' y='190' fill='%23A8B3C5' font-family='Arial' font-size='28'>If, else if, anidados</text>
-               </svg>">
+        <!-- CAMBIO: antes apuntaba a if-multiples.html, ahora corresponde a ifs.html -->
+        <a class="card" href="ifs.html" role="listitem" aria-label="Ir a Condicionantes múltiples">
+          <img class="thumb" alt="Portada de If múltiples" src="ifs.png">
           <div class="card-body">
             <h3 class="card-title">Condicionantes múltiples (If, If anidados)</h3>
             <p class="card-desc">Rangos, prioridades y reglas claras para evitar “lógica spaghetti”.</p>
@@ -617,15 +547,7 @@
         </a>
 
         <a class="card" href="otros-actuadores.html" role="listitem" aria-label="Ir a Otros Actuadores">
-          <img class="thumb" alt="Portada de Otros Actuadores"
-               src="data:image/svg+xml;utf8,
-               <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'>
-                 <rect width='1200' height='675' fill='%23111827'/>
-                 <circle cx='300' cy='520' r='240' fill='%23C8102E' fill-opacity='.14'/>
-                 <circle cx='940' cy='180' r='210' fill='%235AA0FF' fill-opacity='.12'/>
-                 <text x='60' y='120' fill='white' font-family='Arial' font-size='54' font-weight='700'>Otros Actuadores</text>
-                 <text x='60' y='190' fill='%23A8B3C5' font-family='Arial' font-size='28'>Servo, motor, buzzer, relay</text>
-               </svg>">
+          <img class="thumb" alt="Portada de Otros Actuadores" src="otrosactuadores.png">
           <div class="card-body">
             <h3 class="card-title">Otros Actuadores</h3>
             <p class="card-desc">Opciones comunes y cómo elegir el actuador correcto.</p>
@@ -637,15 +559,7 @@
         </a>
 
         <a class="card" href="otros-sensores.html" role="listitem" aria-label="Ir a Otros Sensores">
-          <img class="thumb" alt="Portada de Otros Sensores"
-               src="data:image/svg+xml;utf8,
-               <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'>
-                 <rect width='1200' height='675' fill='%230F172A'/>
-                 <rect x='0' y='0' width='1200' height='675' fill='%23C8102E' fill-opacity='.08'/>
-                 <path d='M140 530 L320 340 L520 430 L720 260 L920 370 L1060 220' fill='none' stroke='%235AA0FF' stroke-opacity='.55' stroke-width='12'/>
-                 <text x='60' y='120' fill='white' font-family='Arial' font-size='54' font-weight='700'>Otros Sensores</text>
-                 <text x='60' y='190' fill='%23A8B3C5' font-family='Arial' font-size='28'>Luz, distancia, temp/humedad</text>
-               </svg>">
+          <img class="thumb" alt="Portada de Otros Sensores" src="otrossensores.png">
           <div class="card-body">
             <h3 class="card-title">Otros Sensores</h3>
             <p class="card-desc">Casos frecuentes y buenas prácticas de lectura/ruido.</p>
